@@ -1,0 +1,114 @@
+# sample requests to api endpoints
+
+POST http://localhost:5000/signup
+Content-Type: application/json
+
+{
+    "username":"akshayurs",
+    "name":"Akshay Urs",
+    "password":12345,
+    "email":"akshayursm@gmail.com"
+}
+
+###
+POST http://localhost:5000/signin
+Content-Type: application/json
+
+{
+    "password":"akshay", 
+    "email":"akshayursm@gmail.com"
+}
+
+###
+POST http://localhost:5000/changepassword
+authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZGJlYjgzMGE3NzNiNTM2OWU3NTVjNiIsImlhdCI6MTY0MTgwODk5MiwiZXhwIjoxNjQzMTA0OTkyfQ.UIQDOTfRmhjv4-SgPkE7oMgmrFk8WIYrFcaLsnsD5GY"
+Content-Type: application/json
+
+{
+    "oldPassword":"12345",
+    "newPassword":"akshay"
+}
+
+
+###
+POST http://localhost:5000/userexists
+Content-Type: application/json
+
+{
+    "username":"{$gt akshayurs}"
+}
+
+
+
+###
+POST http://localhost:5000/createPoll
+authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZGJlYjgzMGE3NzNiNTM2OWU3NTVjNiIsImlhdCI6MTY0MTgwODk5MiwiZXhwIjoxNjQzMTA0OTkyfQ.UIQDOTfRmhjv4-SgPkE7oMgmrFk8WIYrFcaLsnsD5GY"
+Content-Type: application/json
+
+{
+    "title":"my first post",
+    "reqFieldsToAns" : [
+        {
+            "id":0,
+            "fieldType":"string",
+            "title":"Enter your Name"
+        },
+        {
+           "id":0,
+            "fieldType":"radio",
+            "title":"select your gender",
+            "options": ["male","female"] 
+        }
+    ],
+    "questions":[
+        {
+            "id":0,
+            "fieldType":"dropdown",
+            "title":"choose your favourite color",
+            "des":"just to change the theme of application",
+            "options":["blue","red","yellow"]
+        },
+        {
+            "id":0,
+            "fieldType":"number",
+            "title":"enter some random value"
+        }
+        
+    ],
+    "authReq": true,
+    "auth": [{"username": "user1","password":"secret" },{"username": "user2","password":"notsecret"}],
+    "askFeedback": true,
+    "startTime" : 1641897460555,
+    "endTime" : 1641898460555
+}
+
+###
+POST http://localhost:5000/modifypoll
+authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZGJlYjgzMGE3NzNiNTM2OWU3NTVjNiIsImlhdCI6MTY0MTg5ODMzNywiZXhwIjoxNjQzMTk0MzM3fQ.FwU0kDTdPNf_Mvq4Gx6B_ZmrLXpY_TFyCQ_Pa6U_Yn8"
+Content-Type: application/json
+
+{
+    "pollId":"61dd5f463ddf25cbef75839a",
+    "modify":{
+        "title":"my modified post 1",
+        "authReq":true
+    }
+}
+
+###
+POST http://localhost:5000/viewpoll
+Content-Type: application/json
+authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZGJlYjgzMGE3NzNiNTM2OWU3NTVjNiIsImlhdCI6MTY0MTg5ODMzNywiZXhwIjoxNjQzMTk0MzM3fQ.FwU0kDTdPNf_Mvq4Gx6B_ZmrLXpY_TFyCQ_Pa6U_Yn8"
+
+{
+    "pollId": "61dd5f463ddf25cbef75839a"
+}
+
+###
+POST http://localhost:5000/deletepoll
+authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZGJlYjgzMGE3NzNiNTM2OWU3NTVjNiIsImlhdCI6MTY0MTgwNTUxMywiZXhwIjoxNjQzMTAxNTEzfQ.llpj2Xzi0a45GphB66SS99lO2k78-k01vUsmy56EO_g"
+Content-Type: application/json
+
+{
+    "pollId": "61dc29b7f1dd9c7dcef891fc"
+}
