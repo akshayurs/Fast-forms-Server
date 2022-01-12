@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
     lowercase: true,
     required: [true, 'Username is required'],
     unique: true,
+    match: /^[a-zA-Z0-9_\-]*$/,
   },
   name: {
     type: String,
@@ -35,12 +36,21 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  verified: {
+    type: Boolean,
+    default: true,
+    // TODO: false
+  },
   passwordResetToken: {
     type: String,
   },
 })
 
 UserSchema.pre('save', function (next) {
+  if (this.isModified('email')) {
+    this.verified = false
+    this.createdDate = Date.now()
+  }
   if (!this.isModified('password')) return next()
   this.password = bcrypt.hashSync(this.password, 10)
   next()

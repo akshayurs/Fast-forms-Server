@@ -15,7 +15,9 @@ exports.isAuthorized = (req, res, next) => {
       return res.send('NOT AUTHORIZED')
     }
 
-    req.userId = jwt.verify(token, process.env.JWT_SECRET).id
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    req.userId = decoded.id
+    req.isAdmin = decoded.isAdmin
   } catch (e) {
     return res.send('Invalid Token')
   }
@@ -34,10 +36,20 @@ exports.getUserId = (req, res, next) => {
       token = req.cookies.token
     }
 
-    if (token != null && token != '')
-      req.userId = jwt.verify(token, process.env.JWT_SECRET).id
+    if (token != null && token != '') {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+      req.userId = decoded.id
+      req.isAdmin = decoded.isAdmin
+    }
   } catch (e) {
     req.userId = null
+  }
+  next()
+}
+
+exports.checkAdmin = (req, res, next) => {
+  if (!req.isAdmin) {
+    return res.send({ success: false, message: 'You are not Admin' })
   }
   next()
 }

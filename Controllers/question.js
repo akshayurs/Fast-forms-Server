@@ -129,7 +129,7 @@ exports.deletePoll = async (req, res) => {
     oldPoll.deletedTime = Date.now()
     await oldPoll.save()
 
-    res.send({ success: true, oldPoll })
+    res.send({ success: true, message: 'deleted' })
   } catch (err) {
     res.send({ success: false, message: err.message })
   }

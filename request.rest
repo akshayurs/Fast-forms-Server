@@ -4,10 +4,10 @@ POST http://localhost:5000/signup
 Content-Type: application/json
 
 {
-    "username":"akshayurs",
-    "name":"Akshay Urs",
-    "password":12345,
-    "email":"akshayursm@gmail.com"
+    "username":"newausera1",
+    "name":"im checking email user",
+    "password":"password",
+    "email":"fvlkxqudlnxce@frederictonlawyer.com"
 }
 
 ###
@@ -15,8 +15,8 @@ POST http://localhost:5000/signin
 Content-Type: application/json
 
 {
-    "password":"akshay", 
-    "email":"akshayursm@gmail.com"
+    "password":"password", 
+    "username":"newuser1"
 }
 
 ###

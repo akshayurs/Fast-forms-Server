@@ -58,3 +58,44 @@ exports.submitAnswer = async (req, res) => {
     return res.send({ success: false, message: err.message })
   }
 }
+
+// route to view answer
+// creator of poll
+// req.body ={
+//   pollId,
+//   pageNumber,
+//   numberOfItems
+// }
+// sends -> { success,message ,poll, answers, count, prevPage, nextPage }
+exports.viewAnswers = async (req, res) => {
+  try {
+    const { pollId, pageNumber, numberOfItems } = req.body
+    const poll = await Poll.findById(pollId)
+    // poll not found
+    if (!poll) {
+      return res.send({ success: false, message: 'incorrect Id' })
+    }
+    if (!poll.createdBy.equals(req.userId)) {
+      return res.send({ success: false, message: 'Not authorized' })
+    }
+    const answers = await Answer.find({ pollId })
+      .sort({ createdTime: -1 })
+      .skip((pageNumber - 1) * numberOfItems)
+      .limit(numberOfItems)
+    const count = await Answer.countDocuments({ pollId }).exec()
+    let prevPage = true
+    let nextPage = true
+    if (pageNumber === 1) prevPage = false
+    if (count <= pageNumber * numberOfItems) nextPage = false
+    return res.send({
+      success: true,
+      poll,
+      answers,
+      count,
+      prevPage,
+      nextPage,
+    })
+  } catch (err) {
+    res.send({ success: false, message: err.message })
+  }
+}
