@@ -11,16 +11,25 @@ const {
   userExists,
   verifyAccount,
   resetPasswordReq,
+  checkResetToken,
+  resetPassword,
 } = require('./Controllers/auth')
 
 const {
   createPoll,
   modifyPoll,
+  viewPrevPolls,
   viewPoll,
   deletePoll,
 } = require('./Controllers/question')
 
-const { submitAnswer, viewAnswers } = require('./Controllers/answer')
+const {
+  submitAnswer,
+  viewAnswers,
+  viewPrevAns,
+  saveDraftAns,
+  viewDraftAns,
+} = require('./Controllers/answer')
 
 const admin = require('./Controllers/admin')
 
@@ -31,10 +40,9 @@ router.post('/signout', signout)
 router.post('/userexists', userExists)
 router.post('/changepassword', isAuthorized, changePassword)
 router.get('/verify/:token', verifyAccount)
-router.post('/resetPasswordReq/', resetPasswordReq)
-//TODO:
-// check router for password reset GET
-// changing password for reset password POST
+router.post('/resetPasswordReq', resetPasswordReq)
+router.get('/resetpassword/:token', checkResetToken)
+router.post('/resetpassword', resetPassword)
 
 // poll routes
 router.post('/createpoll', isAuthorized, createPoll)
@@ -43,8 +51,12 @@ router.post('/viewpoll', getUserId, viewPoll)
 router.post('/deletepoll', isAuthorized, deletePoll)
 
 // answer routes
-router.post('/submitanswer', submitAnswer)
-router.post('/viewanswers', viewAnswers)
+router.post('/submitanswer', getUserId, submitAnswer)
+router.post('/viewanswers', isAuthorized, viewAnswers)
+router.post('/viewprevans', isAuthorized, viewPrevAns)
+router.post('/viewprevpolls', isAuthorized, viewPrevPolls)
+router.post('/savedraftans', isAuthorized, saveDraftAns)
+router.post('/viewdraftans', isAuthorized, viewDraftAns)
 
 //admin routes
 router.post('/admin/signin', admin.signin)
@@ -57,7 +69,19 @@ router.post('/admin/modifyuser', isAuthorized, checkAdmin, admin.modifyUser)
 router.post('/admin/viewpoll', isAuthorized, checkAdmin, admin.viewPoll)
 router.post('/admin/viewuser', isAuthorized, checkAdmin, admin.viewUser)
 router.post('/admin/viewanswers', isAuthorized, checkAdmin, admin.viewAnswers)
+router.post('/admin/viewprevans', isAuthorized, checkAdmin, admin.viewPrevAns)
+router.post('/admin/submitanswer', isAuthorized, checkAdmin, admin.submitAnswer)
 router.post('/admin/getpolls', isAuthorized, checkAdmin, admin.getPolls)
+router.post(
+  '/admin/viewprevpolls',
+  isAuthorized,
+  checkAdmin,
+  admin.viewPrevPolls
+)
 router.post('/admin/getusers', isAuthorized, checkAdmin, admin.getUsers)
+
+router.get('/test', (req, res) => {
+  res.status(400).send({ success: true, message: 'ok' })
+})
 
 module.exports = router

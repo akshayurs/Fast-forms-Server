@@ -1,7 +1,11 @@
 const jwt = require('jsonwebtoken')
 const User = require('../Models/User')
 const fetch = require('node-fetch')
-const { sendMail, accountConfirmTemplate, passwordResetTemplate } = require('../Helpers/email')
+const {
+  sendMail,
+  accountConfirmTemplate,
+  passwordResetTemplate,
+} = require('../Helpers/email')
 
 // route to sign in user and sending token
 //
@@ -18,11 +22,13 @@ exports.signin = async (req, res) => {
       $or: [{ username }, { email: username }],
     }).select({ password: 1, verified: 1 })
     if (!user || !user.validatePassword(password)) {
-      res.send({ success: false, message: 'invalid credentials' })
+      res
+        .status(401)
+        .send({ success: false, status: 401, message: 'Invalid credentials' })
       return
     }
     if (!user.verified) {
-      return res.send({ success: false, message: 'Account not verified' })
+      return res.status(400).send({ success: false,status:400, message: 'Account not verified' })
     }
 
     const token = jwt.sign({ id: user['_id'] }, process.env.JWT_SECRET, {
@@ -37,7 +43,7 @@ exports.signin = async (req, res) => {
       })
       .send({ success: true, token })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -59,8 +65,9 @@ exports.signup = async (req, res) => {
     if (response.status === 200) {
       const data = await response.json()
       if (data.disposable) {
-        return res.send({
+        return res.status(400).send({
           success: false,
+          status: 400,
           message: 'please provide your original email',
         })
       }
@@ -73,21 +80,24 @@ exports.signup = async (req, res) => {
         expiresIn: process.env.JWT_VERIFY_EXP,
       }
     )
-    //TODO: uncomment
-    // sendMail(
-    //   user.email,
-    //   'Confirm your email address',
-    //   accountConfirmTemplate(
-    //     `${process.env.SITE_URL}/verify/${token}`,
-    //     user.name
-    //   )
-    // )
-    res.send({ success: true, message: 'Account created successfully' })
+    sendMail(
+      user.email,
+      'Confirm your email address',
+      accountConfirmTemplate(
+        `${process.env.SITE_URL}/verify/${token}`,
+        user.name
+      )
+    )
+    res.status(200).send({
+      success: true,
+      status: 200,
+      message: 'Account created successfully',
+    })
   } catch (err) {
     if (err.code == 11000) {
       err.message = 'user already registered, Please sign in to continue'
     }
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -95,7 +105,7 @@ exports.signup = async (req, res) => {
 // sends -> {success:true , message}
 exports.signout = async (req, res) => {
   res.clearCookie('token')
-  res.send({ success: true, message: 'Signed out' })
+  res.status(200).send({ success: true, status: 200, message: 'Signed out' })
 }
 
 //route to change password
@@ -111,13 +121,17 @@ exports.changePassword = async (req, res) => {
   try {
     const user = await User.findById(req.userId).select({ password: 1 })
     if (!user || !user.validatePassword(oldPassword)) {
-      return res.send({ success: false, message: 'invalid credentials' })
+      return res
+        .status(401)
+        .send({ success: false, status: 401, message: 'Invalid credentials' })
     }
     user.password = newPassword
     await user.save()
-    res.send({ success: true, message: 'password changed' })
+    res
+      .status(200)
+      .send({ success: true, status: 200, message: 'password changed' })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -141,7 +155,9 @@ exports.resetPasswordReq = async (req, res) => {
     })
     //user not found
     if (!user) {
-      return res.send({ success: false, message: 'not found' })
+      return es
+        .status(404)
+        .send({ success: false, ststus: 404, message: 'Not found' })
     }
     const token = jwt.sign(
       { passwordResetUser: user['_id'] },
@@ -158,9 +174,59 @@ exports.resetPasswordReq = async (req, res) => {
         user.name
       )
     )
-    res.send({ success: true, message: 'email sent' })
+    res.status(200).send({ success: true, status: 200, message: 'email sent' })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}
+
+//route to check password request token
+exports.checkResetToken = async (req, res) => {
+  const { token } = req.params
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    if (decoded.passwordResetUser) {
+      return res
+        .status(200)
+        .send({ success: true, status: 200, message: 'valid token' })
+    } else {
+      return res.status(401).send({ success: false,status:401, message: "Invalid token'' })alid token' })
+    }
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}
+
+//
+//route to reset password with reset password token
+// res.body = {
+//   token,
+//   password
+// }
+// sends-> {success,message}
+exports.resetPassword = async (req, res) => {
+  const { token, password } = req.body
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    if (!decoded.passwordResetUser) {
+      return res.status(401).send({ success: false,status:401, message: "Invalid token'' })alid token' })
+    }
+
+    let user = await User.findById(decoded.passwordResetUser)
+    if (!user) {
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'Invalid user id' })
+    }
+    user.password = password
+    await user.save()
+    return res.status(200).send({
+      success: true,
+      status: 200,
+      message: 'password reset successful',
+    })
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -176,11 +242,11 @@ exports.userExists = async (req, res) => {
   try {
     const user = await User.findOne({ username })
     if (!user) {
-      return res.send({ success: true, exists: false })
+      return res.status(404).send({ success: false, status: 404 })
     }
-    return res.send({ success: true, exists: true })
+    return res.status(200).send({ success: true, status: 200 })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -193,12 +259,16 @@ exports.verifyAccount = async (req, res) => {
     const user = await User.findById(notVerifiedUser)
     console.log(user)
     if (!user || user.verified) {
-      return res.send({ success: true, message: 'Invalid id' })
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'Invalid id' })
     }
     user.verified = true
     await user.save()
-    res.send({ success: true, message: 'account verified' })
+    res
+      .status(200)
+      .send({ success: true, status: 200, message: 'account verified' })
   } catch (err) {
-    return res.send({ success: true, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }

@@ -12,10 +12,10 @@ mongoose.connect(process.env.MONGO_URI)
 const PORT = process.env.PORT || 5000
 
 const rateLimit = require('express-rate-limit')
-//limiting 100 requests for 15mins
+
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: process.env.RATE_LIM_MINS * 60 * 1000,
+  max: process.env.RATE_LIM_REQ,
   standardHeaders: true,
   legacyHeaders: false,
 })
@@ -34,7 +34,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 process.on('unhandledRejection', (error) => {
-  console.log('unhandledRejection - ', error)
+  console.log('unhandledRejection -> \n ', error)
 })
 
 app.use('/', router)

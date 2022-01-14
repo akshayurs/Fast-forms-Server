@@ -16,18 +16,16 @@ const pollSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  sendEmails: {
+    type: Boolean,
+    default: true,
+  },
   auth: {
     type: [
       {
-        username: {
+        email: {
           type: String,
           trim: true,
-          minLength: 3,
-          maxLength: 25,
-          required: true,
-        },
-        password: {
-          type: String,
           minLength: 3,
           maxLength: 25,
           required: true,

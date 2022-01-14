@@ -20,7 +20,9 @@ exports.signin = async (req, res) => {
       isAdmin: 1,
     })
     if (!user || !user.validatePassword(password) || !user._doc.isAdmin) {
-      return res.send({ success: false, message: 'invalid credentials' })
+      return res
+        .status(401)
+        .send({ success: false, status: 401, message: 'invalid credentials' })
     }
 
     const token = jwt.sign(
@@ -37,9 +39,12 @@ exports.signin = async (req, res) => {
         ),
         httpOnly: true,
       })
-      .send({ success: true, token })
+      .status(200)
+      .send({ success: true, status: 200, token })
   } catch (err) {
-    return res.send({ success: false, message: err.message })
+    return res
+      .status(500)
+      .send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -54,15 +59,17 @@ exports.deletePoll = async (req, res) => {
 
     //poll not found or poll already deleted
     if (!oldPoll || oldPoll.deleted) {
-      return res.send({ success: false, message: 'active poll not found' })
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'active poll not found' })
     }
     oldPoll.deleted = true
     oldPoll.deletedTime = Date.now()
     await oldPoll.save()
 
-    res.send({ success: true, message: 'deleted' })
+    res.status(200).send({ success: true, status: 200, message: 'deleted' })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -79,13 +86,15 @@ exports.viewPoll = async (req, res) => {
 
     //poll not found
     if (!poll) {
-      return res.send({ success: false, message: 'Incorrect id' })
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'Incorrect id' })
     }
 
     await poll.populate('createdBy', { name: 1, username: 1, _id: 0 })
-    res.send({ success: true, poll, owner: false })
+    res.status(200).send({ success: true, status: 200, poll, owner: false })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -110,12 +119,14 @@ exports.viewUser = async (req, res) => {
 
     //user not found
     if (!user) {
-      return res.send({ success: false, message: 'not found' })
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'not found' })
     }
 
-    res.send({ success: true, user })
+    res.status(200).send({ success: true, status: 200, user })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -140,12 +151,16 @@ exports.deleteUser = async (req, res) => {
 
     //user not found
     if (!user) {
-      return res.send({ success: false, message: 'not found' })
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'not found' })
     }
 
-    res.send({ success: true, user, message: 'user deleted' })
+    res
+      .status(200)
+      .send({ success: true, status: 200, user, message: 'user deleted' })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -160,12 +175,14 @@ exports.deleteAnswer = async (req, res) => {
     let answer = await User.findOneAndDelete(answerId)
 
     if (!answer) {
-      return res.send({ success: false, message: 'not found' })
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'not found' })
     }
 
-    res.send({ success: true, answer })
+    res.status(200).send({ success: true, status: 200, answer })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -183,13 +200,15 @@ exports.viewPoll = async (req, res) => {
 
     //poll not found
     if (!poll) {
-      return res.send({ success: false, message: 'Incorrect id' })
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'Incorrect id' })
     }
 
     await poll.populate('createdBy', { name: 1, username: 1, _id: 0 })
-    res.send({ success: true, poll, owner: false })
+    res.status(200).send({ success: true, status: 200, poll, owner: false })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -203,18 +222,24 @@ exports.viewPoll = async (req, res) => {
 exports.viewAnswers = async (req, res) => {
   try {
     const { pollId, pageNumber, numberOfItems } = req.body
+    pageNumber = pageNumber ?? 1
+    numberOfItems = numberOfItems ?? 10
     const poll = await Poll.findById(pollId)
     // poll not found
     if (!poll) {
-      return res.send({ success: false, message: 'incorrect Id' })
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'incorrect Id' })
     }
 
-    const answers = await Answer.find({ pollId })
+    const answers = await Answer.find({ pollId: mongodb.ObjectID(pollId) })
       .sort({ createdTime: -1 })
       .skip((pageNumber - 1) * numberOfItems)
       .limit(numberOfItems)
 
-    const count = await Answer.countDocuments({ pollId }).exec()
+    const count = await Answer.countDocuments({
+      pollId: mongodb.ObjectID(pollId),
+    }).exec()
 
     let prevPage = true
     let nextPage = true
@@ -222,16 +247,19 @@ exports.viewAnswers = async (req, res) => {
     if (pageNumber === 0) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
 
-    return res.send({
-      success: true,
-      poll,
-      answers,
-      count,
-      prevPage,
-      nextPage,
-    })
+    return res
+      .status(200)
+      .send({
+        status: 200,
+        success: true,
+        poll,
+        answers,
+        count,
+        prevPage,
+        nextPage,
+      })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -253,9 +281,9 @@ exports.modifyPoll = async (req, res) => {
     })
     oldPoll.modifiedTime = Date.now()
     await oldPoll.save()
-    res.send({ success: true, poll: oldPoll })
+    res.status(200).send({ success: true, status: 200, poll: oldPoll })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -282,7 +310,9 @@ exports.modifyUser = async (req, res) => {
     })
 
     if (!user) {
-      return res.send({ success: false, message: 'not found' })
+      return res
+        .status(404)
+        .send({ success: false, ststus: 404, message: 'Not found' })
     }
 
     Object.entries(modify).forEach((arr) => {
@@ -291,9 +321,9 @@ exports.modifyUser = async (req, res) => {
 
     await user.save()
 
-    res.send({ success: true, user })
+    res.status(200).send({ success: true, status: 200, user })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -311,7 +341,9 @@ exports.modifyAnswer = async (req, res) => {
     let answer = await User.findById(answerId)
 
     if (!answer) {
-      return res.send({ success: false, message: 'not found' })
+      return es
+        .status(404)
+        .send({ success: false, ststus: 404, message: 'Not found' })
     }
 
     Object.entries(req.body.modify).forEach((arr) => {
@@ -320,9 +352,9 @@ exports.modifyAnswer = async (req, res) => {
 
     await answer.save()
 
-    res.send({ success: true, answer })
+    res.status(200).send({ success: true, status: 200, answer })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -335,7 +367,8 @@ exports.modifyAnswer = async (req, res) => {
 exports.getUsers = async (req, res) => {
   try {
     const { pageNumber, numberOfItems } = req.body
-
+    pageNumber = pageNumber ?? 1
+    numberOfItems = numberOfItems ?? 10
     const users = await User.find()
       .sort({ createdDate: -1 })
       .skip((pageNumber - 1) * numberOfItems)
@@ -345,15 +378,11 @@ exports.getUsers = async (req, res) => {
     let nextPage = true
     if (pageNumber === 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
-    return res.send({
-      success: true,
-      users,
-      prevPage,
-      nextPage,
-      count,
-    })
+    return res
+      .status(200)
+      .send({ status: 200, success: true, users, prevPage, nextPage, count })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
 
@@ -366,7 +395,8 @@ exports.getUsers = async (req, res) => {
 exports.getPolls = async (req, res) => {
   try {
     const { pageNumber, numberOfItems } = req.body
-
+    pageNumber = pageNumber ?? 1
+    numberOfItems = numberOfItems ?? 10
     const polls = await Poll.find()
       .sort({ createdDate: -1 })
       .skip((pageNumber - 1) * numberOfItems)
@@ -376,14 +406,126 @@ exports.getPolls = async (req, res) => {
     let nextPage = true
     if (pageNumber === 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
-    return res.send({
-      success: true,
-      polls,
-      prevPage,
-      nextPage,
-      count,
-    })
+    return res
+      .status(200)
+      .send({ status: 200, success: true, polls, prevPage, nextPage, count })
   } catch (err) {
-    res.send({ success: false, message: err.message })
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}
+
+//route to submit answer
+// req.body = {
+//   pollId,
+//   ans = { }
+// }
+// sends -> {success,message,answer}
+exports.submitAnswer = async (req, res) => {
+  try {
+    const poll = await Poll.findById(req.body.pollId)
+    // poll not found
+    if (!poll) {
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'Incorrect id' })
+    }
+    const answer = await Answer.create({ ...req.body, ...req.body.ans })
+    res.status(200).send({ success: true, status: 200, answer })
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}
+
+// route to view previous answers of user
+// creator of poll
+// req.body ={
+//   userId // id or username or email
+//   pageNumber,
+//   numberOfItems
+// }
+// sends -> { success,message ,poll, answers, count, prevPage, nextPage }
+exports.viewPrevAns = async (req, res) => {
+  try {
+    const { pageNumber, numberOfItems, userId } = req.body
+    pageNumber = pageNumber ?? 1
+    numberOfItems = numberOfItems ?? 10
+    if (mongodb.ObjectID.isValid(userId)) {
+      req.userId = userId
+    } else {
+      const user = await User.findOne({
+        $or: [{ email: userId }, { username: userId }, { _id: objectId }],
+      })
+      if (!user) {
+        return res
+          .status(404)
+          .send({ success: false, status: 404, message: 'Invalid user id' })
+      }
+      res.userId = user._id
+    }
+    const answers = await Answer.find({
+      submittedBy: mongodb.ObjectID(req.userId),
+    })
+      .sort({ createdTime: -1 })
+      .skip((pageNumber - 1) * numberOfItems)
+      .limit(numberOfItems)
+    const count = await Answer.countDocuments({
+      submittedBy: mongodb.ObjectID(req.userId),
+    }).exec()
+    let prevPage = true
+    let nextPage = true
+    if (pageNumber === 1) prevPage = false
+    if (count <= pageNumber * numberOfItems) nextPage = false
+    return res
+      .status(200)
+      .send({ status: 200, success: true, answers, count, prevPage, nextPage })
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}
+
+// route to view previous polls of user
+// creator of poll
+// req.body ={
+//   userId
+//   pageNumber,
+//   numberOfItems
+// }
+// sends -> { success,message ,polls, count, prevPage, nextPage }
+exports.viewPrevPolls = async (req, res) => {
+  try {
+    const { pageNumber, numberOfItems, userId } = req.body
+    pageNumber = pageNumber ?? 1
+    numberOfItems = numberOfItems ?? 10
+    if (mongodb.ObjectID.isValid(userId)) {
+      req.userId = userId
+    } else {
+      const user = await User.findOne({
+        $or: [{ email: userId }, { username: userId }, { _id: objectId }],
+      })
+      if (!user) {
+        return res
+          .status(404)
+          .send({ success: false, status: 404, message: 'Invalid user id' })
+      }
+      res.userId = user._id
+    }
+    const polls = await Poll.find({ createdBy: mongodb.ObjectID(req.userId) })
+      .sort({ createdTime: -1 })
+      .skip((pageNumber - 1) * numberOfItems)
+      .limit(numberOfItems)
+
+    const count = await Poll.countDocuments({
+      createdBy: mongodb.ObjectID(req.userId),
+    }).exec()
+
+    let prevPage = true
+    let nextPage = true
+    if (pageNumber === 1) prevPage = false
+    if (count <= pageNumber * numberOfItems) nextPage = false
+    return res
+      .status(200)
+      .send({ status: 200, success: true, polls, count, prevPage, nextPage })
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }

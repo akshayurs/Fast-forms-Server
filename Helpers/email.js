@@ -16,6 +16,11 @@ exports.sendMail = async (to, subject, body) => {
     text: body,
     html: body,
   })
+  return info
+}
+
+exports.newPollTemplate = (URL, NAME, TITLE, POLL_CREATOR) => {
+  return `empty form`
 }
 
 exports.accountConfirmTemplate = (URL, NAME) => {

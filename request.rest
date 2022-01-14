@@ -76,7 +76,7 @@ Content-Type: application/json
         
     ],
     "authReq": true,
-    "auth": [{"username": "user1","password":"secret" },{"username": "user2","password":"notsecret"}],
+    "auth": [{"email":"akshayursm@gmail.com"},{"email":"akshayursm2015@gmail.com"}],
     "askFeedback": true,
     "startTime" : 1641897460555,
     "endTime" : 1641898460555

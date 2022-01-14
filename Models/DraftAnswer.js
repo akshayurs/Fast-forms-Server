@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const AnswerSchema = new mongoose.Schema({
+const DraftAnswerSchema = new mongoose.Schema({
   pollId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Poll',
@@ -8,9 +8,6 @@ const AnswerSchema = new mongoose.Schema({
   submittedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-  },
-  email: {
-    type: String,
   },
   reqFieldsAns: {
     type: [
@@ -46,13 +43,6 @@ const AnswerSchema = new mongoose.Schema({
     type: String,
     maxLength: 500,
   },
-  createdTime: {
-    type: Date,
-    default: Date.now(),
-  },
-  modifiedTime: {
-    type: Date,
-  },
 })
 
-module.exports = mongoose.model('Answer', AnswerSchema)
+module.exports = mongoose.model('DraftAnswer', DraftAnswerSchema)
