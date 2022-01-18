@@ -8,7 +8,7 @@ const DraftAnswer = require('../Models/DraftAnswer')
 //     pollId,
 //     ans : {}
 // }
-// returns -> {success,message}
+// returns -> {success,status,message}
 exports.submitAnswer = async (req, res) => {
   try {
     const poll = await Poll.findById(req.body.pollId)
@@ -169,7 +169,7 @@ exports.viewPrevAns = async (req, res) => {
 //   pollId,
 //   ans: {},
 // }
-// returns -> {success,message}
+// returns -> {success,status,message}
 exports.saveDraftAns = async (req, res) => {
   try {
     if (req.userId) {
@@ -210,7 +210,7 @@ exports.saveDraftAns = async (req, res) => {
 //   pollId,
 //   ans: {},
 // }
-// returns -> {success,message}
+// returns -> {success,status,message}
 exports.viewDraftAns = async (req, res) => {
   try {
     if (req.userId) {

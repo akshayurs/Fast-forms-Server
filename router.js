@@ -53,12 +53,12 @@ router.post('/poll', isAuthorized, createPoll)
 router.put('/poll', isAuthorized, modifyPoll)
 router.get('/poll', getUserId, viewPoll)
 router.delete('/poll', isAuthorized, deletePoll)
+router.get('/userpolls', isAuthorized, viewPrevPolls)
 
 // answer routes
 router.post('/answer', getUserId, submitAnswer)
 router.get('/answers', isAuthorized, viewAnswers)
 router.get('/userans', isAuthorized, viewPrevAns)
-router.get('/userpolls', isAuthorized, viewPrevPolls)
 router.post('/draft', isAuthorized, saveDraftAns)
 router.get('/draft', isAuthorized, viewDraftAns)
 

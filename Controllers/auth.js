@@ -142,6 +142,7 @@ exports.changePassword = async (req, res) => {
 //req.body = {
 //  username //username or email
 //}
+// returns - > {success, status,message}
 exports.resetPasswordReq = async (req, res) => {
   const { userId } = req.body
   try {
@@ -159,7 +160,7 @@ exports.resetPasswordReq = async (req, res) => {
     if (!user) {
       return es
         .status(404)
-        .send({ success: false, ststus: 404, message: 'Not found' })
+        .send({ success: false, status: 404, message: 'Not found' })
     }
     const token = jwt.sign(
       { passwordResetUser: user['_id'] },
@@ -183,6 +184,7 @@ exports.resetPasswordReq = async (req, res) => {
 }
 
 //route to check password request token
+// returns -> {success, status, message}
 exports.checkResetToken = async (req, res) => {
   const { token } = req.params
   try {
@@ -207,7 +209,7 @@ exports.checkResetToken = async (req, res) => {
 //   token,
 //   password
 // }
-// sends-> {success,message}
+// returns -> {success,message}
 exports.resetPassword = async (req, res) => {
   const { token, password } = req.body
   try {

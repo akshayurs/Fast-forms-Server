@@ -2,6 +2,13 @@ const Poll = require('../Models/Poll')
 const User = require('../Models/User')
 const { sendMail, newPollTemplate } = require('../Helpers/email')
 
+// route to create poll
+// signed in users
+// req.body = {
+//   userId
+// }
+//
+// returns -> { success, status, message}
 exports.createPoll = async (req, res) => {
   try {
     const user = await User.findById(req.userId)
@@ -40,7 +47,7 @@ exports.createPoll = async (req, res) => {
 //   modify : { field1: value1, ....}
 // }
 //
-// returns -> { success,message}
+// returns -> { success,status,message}
 exports.modifyPoll = async (req, res) => {
   try {
     let poll = await Poll.findById(req.body.pollId)
@@ -109,7 +116,7 @@ exports.modifyPoll = async (req, res) => {
 //   pollId,
 // }
 //
-// returns -> { success,message,poll}
+// returns -> { success,status,message,poll}
 exports.viewPoll = async (req, res) => {
   try {
     const poll = await Poll.findById(req.body.pollId).select('-_id -__v')
@@ -168,17 +175,17 @@ exports.viewPoll = async (req, res) => {
   }
 }
 
-// route to modify poll
+// route to delete poll
 // signed in users
 // req.body = {
 //   pollId
-//   modify : { field1: value1, ....}
 // }
 //
-// returns -> { success,message}
+// returns -> { success,status,message}
 exports.deletePoll = async (req, res) => {
+  const { pollId } = req.body
   try {
-    let oldPoll = await Poll.findById(req.body.pollId)
+    let oldPoll = await Poll.findById(pollId)
 
     //poll not found or poll already deleted or poll is not by user
     if (!oldPoll || oldPoll.deleted || oldPoll.createdBy.equals(req.userId)) {
@@ -198,7 +205,6 @@ exports.deletePoll = async (req, res) => {
 }
 
 // route to view previous polls of user
-// creator of poll
 // req.body ={
 //   pageNumber,
 //   numberOfItems

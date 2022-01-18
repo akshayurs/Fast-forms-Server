@@ -1,8 +1,8 @@
 # Fast Forms Api
 
-### API end points
+## API end points
 
-#### Authentication Routes
+### Authentication Routes
 
 - Signing up or register
 
@@ -77,18 +77,160 @@ returns -> {success, message}
 
 ```js
 POST /resetPasswordReq
+
+body = {
+  username
+}
+
+returns - > {success, status,message}
 ```
 
--
+- check password request token
 
 ```js
 GET /resetpassword/:token
+
+returns -> {success, status, message}
 ```
 
--
+- reset password with reset password token
 
 ```js
-POST /resetpassword
+post /resetpassword
+
+body = {
+  token,
+  password
+}
+
+returns -> {success,message}
+```
+
+### Poll Routes
+
+- create poll
+
+```js
+POST /poll
+
+body = {
+  userId
+}
+
+returns -> {success,status,message}
+```
+
+- modify poll
+
+```js
+PUT /poll
+
+body = {
+  pollId
+  modify : { field1: value1, ....}
+}
+
+returns -> {success,status,message}
+```
+
+- view poll
+
+```js
+GET /poll
+
+body = {
+  pollId,
+}
+
+returns -> {success,status,message,poll}
+```
+
+- delete poll
+
+```js
+DELETE /poll
+
+body = {
+  pollId
+}
+
+returns -> {success,status,message}
+
+```
+
+- view previous polls of user
+
+```js
+GET /userpolls
+
+body = {
+  pageNumber,
+  numberOfItems
+}
+returns -> {success, message, polls, count, prevPage, nextPage }
+```
+
+### Answer Routes
+
+- submit answer to poll
+
+```js
+POST /answer
+
+body = {
+  pollId,
+  ans : {}
+}
+returns -> {success,status,message}
+```
+
+- view answer
+
+```js
+GET /answer
+
+body = {
+  pollId,
+  pageNumber,
+  numberofItems
+}
+returns -> {success ,message ,poll ,answers ,count ,prevPage ,nextPage }
+```
+
+- view previous answers of user
+
+```js
+GET /userans
+
+body = {
+  pageNumber,
+  numberOfItems
+}
+returns -> { success ,message ,poll ,answers ,count ,prevPage ,nextPage }
+```
+
+- save draft answer
+
+```js
+POST /draft
+
+body = {
+  pollId,
+  ans: {},
+}
+returns -> {success,status,message}
+```
+
+- view draft answer
+
+```js
+GET /draft
+
+body = {
+  pollId,
+  ans: {},
+}
+returns -> {success,status,message}
 ```
 
 ### User details :
@@ -277,6 +419,7 @@ POST /resetpassword
 ```
 
 ### Answer details :
+
 ```js
 
     pollId: {
