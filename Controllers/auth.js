@@ -158,7 +158,7 @@ exports.resetPasswordReq = async (req, res) => {
     })
     //user not found
     if (!user) {
-      return es
+      return res
         .status(404)
         .send({ success: false, status: 404, message: 'Not found' })
     }
