@@ -6,7 +6,7 @@
 
 - Signing up or register
 
-```http
+```js
 POST /signup
 
 body = {
@@ -21,7 +21,7 @@ body = {
 
 - Sign in user and sending token
 
-```http
+```js
 POST /signin
 
 body = {
@@ -34,7 +34,7 @@ returns -> {success, token, message}
 
 - Sign out or log out and clear cookies
 
-```http
+```js
 GET /signout
 
 returns -> {success, message}
@@ -42,7 +42,7 @@ returns -> {success, message}
 
 - Check existing user
 
-```http
+```js
 GET /userexists
 
 body = {
@@ -54,7 +54,7 @@ returns -> { success, message, exists}
 
 - change password
 
-```http
+```js
 POST /changepassword
 
 body = {
@@ -67,7 +67,7 @@ returns -> {success, message}
 
 - verify account
 
-```http
+```js
 GET /verify/:token
 
 returns -> {success, message}
@@ -75,19 +75,19 @@ returns -> {success, message}
 
 - generate reset password token
 
-```http
+```js
 POST /resetPasswordReq
 ```
 
 -
 
-```http
+```js
 GET /resetpassword/:token
 ```
 
 -
 
-```http
+```js
 POST /resetpassword
 ```
 
