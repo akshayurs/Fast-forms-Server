@@ -8,7 +8,7 @@ const DraftAnswer = require('../Models/DraftAnswer')
 //     pollId,
 //     ans : {}
 // }
-// sends -> {success,message}
+// returns -> {success,message}
 exports.submitAnswer = async (req, res) => {
   try {
     const poll = await Poll.findById(req.body.pollId)
@@ -24,7 +24,11 @@ exports.submitAnswer = async (req, res) => {
     if (poll.authReq == true) {
       user = await User.findById(req.userId)
       if (!user || !(user.email in poll.auth)) {
-        return res.status(401).send({ success: false,status:401, message: "authentication failed'' })
+        return res.status(401).send({
+          success: false,
+          status: 401,
+          message: 'authentication failed',
+        })
       }
     }
 
@@ -33,7 +37,8 @@ exports.submitAnswer = async (req, res) => {
       req.body.ans.reqFieldsAns.length != poll.reqFieldsToAns.length ||
       req.body.ans.queFieldsAns.length != poll.questions.length
     ) {
-      return res.status(200).send({ status:200,
+      return res.status(200).send({
+        status: 200,
         success: false,
         message: 'answer fields not matching',
       })
@@ -45,7 +50,9 @@ exports.submitAnswer = async (req, res) => {
         submittedBy: mongodb.ObjectID(req.userId),
       })
       if (oldAnswer) {
-        return res.status(400).send({ success: false,status:400, message: 'already submitted' })
+        return res
+          .status(400)
+          .send({ success: false, status: 400, message: 'already submitted' })
       }
     }
     let answer
@@ -79,7 +86,7 @@ exports.submitAnswer = async (req, res) => {
 //   pageNumber,
 //   numberOfItems
 // }
-// sends -> { success,message ,poll, answers, count, prevPage, nextPage }
+// returns -> { success,message ,poll, answers, count, prevPage, nextPage }
 exports.viewAnswers = async (req, res) => {
   try {
     const { pollId, pageNumber, numberOfItems } = req.body
@@ -93,7 +100,9 @@ exports.viewAnswers = async (req, res) => {
         .send({ success: false, status: 404, message: 'Incorrect id' })
     }
     if (!poll.createdBy.equals(req.userId)) {
-      return res.status(401).send({ success: false,status:401, message: "Not authorized'' })
+      return res
+        .status(401)
+        .send({ success: false, status: 401, message: 'Not authorized' })
     }
     const answers = await Answer.find({ pollId: mongodb.ObjectID(pollId) })
       .sort({ createdTime: -1 })
@@ -106,7 +115,8 @@ exports.viewAnswers = async (req, res) => {
     let nextPage = true
     if (pageNumber === 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
-    return res.status(200).send({ status:200,
+    return res.status(200).send({
+      status: 200,
       success: true,
       poll,
       answers,
@@ -125,7 +135,7 @@ exports.viewAnswers = async (req, res) => {
 //   pageNumber,
 //   numberOfItems
 // }
-// sends -> { success,message ,poll, answers, count, prevPage, nextPage }
+// returns -> { success,message ,poll, answers, count, prevPage, nextPage }
 exports.viewPrevAns = async (req, res) => {
   try {
     const { pageNumber, numberOfItems } = req.body
@@ -144,13 +154,9 @@ exports.viewPrevAns = async (req, res) => {
     let nextPage = true
     if (pageNumber === 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
-    return res.status(200).send({ status:200,
-      success: true,
-      answers,
-      count,
-      prevPage,
-      nextPage,
-    })
+    return res
+      .status(200)
+      .send({ status: 200, success: true, answers, count, prevPage, nextPage })
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }
@@ -163,11 +169,13 @@ exports.viewPrevAns = async (req, res) => {
 //   pollId,
 //   ans: {},
 // }
-// sends -> {success,message}
+// returns -> {success,message}
 exports.saveDraftAns = async (req, res) => {
   try {
     if (req.userId) {
-      return res.status(401).send({ success: false,status:401, message: "Signin to access'' })
+      return res
+        .status(401)
+        .send({ success: false, status: 401, message: 'Signin to access' })
     }
 
     const options = {
@@ -202,11 +210,13 @@ exports.saveDraftAns = async (req, res) => {
 //   pollId,
 //   ans: {},
 // }
-// sends -> {success,message}
+// returns -> {success,message}
 exports.viewDraftAns = async (req, res) => {
   try {
     if (req.userId) {
-      return res.status(401).send({ success: false,status:401, message: "Signin to access'' })
+      return res
+        .status(401)
+        .send({ success: false, status: 401, message: 'Signin to access' })
     }
     let answer = await DraftAnswer.findOne({
       pollId: mongodb.ObjectID(pollId),

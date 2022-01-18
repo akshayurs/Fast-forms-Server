@@ -14,7 +14,7 @@ const {
 //   password
 // }
 //
-// sends -> {success, token, message}
+// returns -> {success, token, message}
 exports.signin = async (req, res) => {
   const { username, password } = req.body
   try {
@@ -28,7 +28,9 @@ exports.signin = async (req, res) => {
       return
     }
     if (!user.verified) {
-      return res.status(400).send({ success: false,status:400, message: 'Account not verified' })
+      return res
+        .status(400)
+        .send({ success: false, status: 400, message: 'Account not verified' })
     }
 
     const token = jwt.sign({ id: user['_id'] }, process.env.JWT_SECRET, {
@@ -56,7 +58,7 @@ exports.signin = async (req, res) => {
 //   password
 // }
 //
-// sends -> {success: Boolean, message, token }
+// returns -> {success: Boolean, message, token }
 exports.signup = async (req, res) => {
   try {
     const response = await fetch(
@@ -102,7 +104,7 @@ exports.signup = async (req, res) => {
 }
 
 // route to sign out and clear cookies
-// sends -> {success:true , message}
+// returns -> {success:true , message}
 exports.signout = async (req, res) => {
   res.clearCookie('token')
   res.status(200).send({ success: true, status: 200, message: 'Signed out' })
@@ -115,7 +117,7 @@ exports.signout = async (req, res) => {
 //  newPassword
 // }
 //
-// sends -> {success:Boolean,message}
+// returns -> {success:Boolean,message}
 exports.changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body
   try {
@@ -190,7 +192,9 @@ exports.checkResetToken = async (req, res) => {
         .status(200)
         .send({ success: true, status: 200, message: 'valid token' })
     } else {
-      return res.status(401).send({ success: false,status:401, message: "Invalid token'' })alid token' })
+      return res
+        .status(401)
+        .send({ success: false, status: 401, message: 'Invalid token' })
     }
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
@@ -209,7 +213,9 @@ exports.resetPassword = async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     if (!decoded.passwordResetUser) {
-      return res.status(401).send({ success: false,status:401, message: "Invalid token'' })alid token' })
+      return res
+        .status(401)
+        .send({ success: false, status: 401, message: 'Invalid token' })
     }
 
     let user = await User.findById(decoded.passwordResetUser)
@@ -236,7 +242,7 @@ exports.resetPassword = async (req, res) => {
 //  username
 //}
 //
-// sends -> { success: true , message, exists}
+// returns -> { success: true, status, message, exists}
 exports.userExists = async (req, res) => {
   const { username } = req.body
   try {
@@ -251,6 +257,7 @@ exports.userExists = async (req, res) => {
 }
 
 // route to verify account
+// returns -> {success,message}
 exports.verifyAccount = async (req, res) => {
   const { token } = req.params
   try {

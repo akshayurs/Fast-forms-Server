@@ -33,11 +33,15 @@ const {
 
 const admin = require('./Controllers/admin')
 
+router.get('/', (req, res) => {
+  res.status(200).send({ success: true, message: 'fast forms server running' })
+})
+
 //auth routes
 router.post('/signin', signin)
 router.post('/signup', signup)
-router.post('/signout', signout)
-router.post('/userexists', userExists)
+router.get('/signout', signout)
+router.get('/userexists', userExists)
 router.post('/changepassword', isAuthorized, changePassword)
 router.get('/verify/:token', verifyAccount)
 router.post('/resetPasswordReq', resetPasswordReq)
@@ -45,43 +49,34 @@ router.get('/resetpassword/:token', checkResetToken)
 router.post('/resetpassword', resetPassword)
 
 // poll routes
-router.post('/createpoll', isAuthorized, createPoll)
-router.post('/modifypoll', isAuthorized, modifyPoll)
-router.post('/viewpoll', getUserId, viewPoll)
-router.post('/deletepoll', isAuthorized, deletePoll)
+router.post('/poll', isAuthorized, createPoll)
+router.put('/poll', isAuthorized, modifyPoll)
+router.get('/poll', getUserId, viewPoll)
+router.delete('/poll', isAuthorized, deletePoll)
 
 // answer routes
-router.post('/submitanswer', getUserId, submitAnswer)
-router.post('/viewanswers', isAuthorized, viewAnswers)
-router.post('/viewprevans', isAuthorized, viewPrevAns)
-router.post('/viewprevpolls', isAuthorized, viewPrevPolls)
-router.post('/savedraftans', isAuthorized, saveDraftAns)
-router.post('/viewdraftans', isAuthorized, viewDraftAns)
+router.post('/answer', getUserId, submitAnswer)
+router.get('/answers', isAuthorized, viewAnswers)
+router.get('/userans', isAuthorized, viewPrevAns)
+router.get('/userpolls', isAuthorized, viewPrevPolls)
+router.post('/draft', isAuthorized, saveDraftAns)
+router.get('/draft', isAuthorized, viewDraftAns)
 
 //admin routes
 router.post('/admin/signin', admin.signin)
-router.post('/admin/deletepoll', isAuthorized, checkAdmin, admin.deletePoll)
-router.post('/admin/deleteanswer', isAuthorized, checkAdmin, admin.deleteAnswer)
-router.post('/admin/deleteuser', isAuthorized, checkAdmin, admin.deleteUser)
-router.post('/admin/modifyanswer', isAuthorized, checkAdmin, admin.modifyAnswer)
-router.post('/admin/modifypoll', isAuthorized, checkAdmin, admin.modifyPoll)
-router.post('/admin/modifyuser', isAuthorized, checkAdmin, admin.modifyUser)
-router.post('/admin/viewpoll', isAuthorized, checkAdmin, admin.viewPoll)
-router.post('/admin/viewuser', isAuthorized, checkAdmin, admin.viewUser)
-router.post('/admin/viewanswers', isAuthorized, checkAdmin, admin.viewAnswers)
-router.post('/admin/viewprevans', isAuthorized, checkAdmin, admin.viewPrevAns)
-router.post('/admin/submitanswer', isAuthorized, checkAdmin, admin.submitAnswer)
-router.post('/admin/getpolls', isAuthorized, checkAdmin, admin.getPolls)
-router.post(
-  '/admin/viewprevpolls',
-  isAuthorized,
-  checkAdmin,
-  admin.viewPrevPolls
-)
-router.post('/admin/getusers', isAuthorized, checkAdmin, admin.getUsers)
-
-router.get('/test', (req, res) => {
-  res.status(400).send({ success: true, message: 'ok' })
-})
+router.delete('/admin/poll', isAuthorized, checkAdmin, admin.deletePoll)
+router.put('/admin/poll', isAuthorized, checkAdmin, admin.modifyPoll)
+router.get('/admin/poll', isAuthorized, checkAdmin, admin.viewPoll)
+router.get('/admin/polls', isAuthorized, checkAdmin, admin.getPolls)
+router.get('/admin/userpolls', isAuthorized, checkAdmin, admin.viewPrevPolls)
+router.get('/admin/answer', isAuthorized, checkAdmin, admin.viewAnswers)
+router.post('/admin/answer', isAuthorized, checkAdmin, admin.submitAnswer)
+router.delete('/admin/answer', isAuthorized, checkAdmin, admin.deleteAnswer)
+router.put('/admin/answer', isAuthorized, checkAdmin, admin.modifyAnswer)
+router.get('/admin/userans', isAuthorized, checkAdmin, admin.viewPrevAns)
+router.get('/admin/getusers', isAuthorized, checkAdmin, admin.getUsers)
+router.delete('/admin/user', isAuthorized, checkAdmin, admin.deleteUser)
+router.put('/admin/user', isAuthorized, checkAdmin, admin.modifyUser)
+router.get('/admin/user', isAuthorized, checkAdmin, admin.viewUser)
 
 module.exports = router

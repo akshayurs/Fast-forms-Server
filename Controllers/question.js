@@ -9,7 +9,7 @@ exports.createPoll = async (req, res) => {
       return res.status(404).send({
         success: false,
         status: 404,
-        message: 'invalid user id',
+        message: 'Invalid user id',
       })
     }
     const newPoll = await Poll.create({ createdBy: req.userId, ...req.body })
@@ -20,7 +20,7 @@ exports.createPoll = async (req, res) => {
         newPoll.title,
         newPollTemplate(
           `${process.env.SITE_URL}/view/${newPoll._id}`,
-          '',
+
           newPoll.title,
           user.name,
           poll.startTime,
@@ -40,7 +40,7 @@ exports.createPoll = async (req, res) => {
 //   modify : { field1: value1, ....}
 // }
 //
-// sends -> { success,message}
+// returns -> { success,message}
 exports.modifyPoll = async (req, res) => {
   try {
     let poll = await Poll.findById(req.body.pollId)
@@ -53,13 +53,15 @@ exports.modifyPoll = async (req, res) => {
       !poll.createdBy.equals(req.userId) ||
       poll.queEditable != true
     ) {
-      return res.status(401).send({ success: false,status:401, message: "Not authorized'' })
+      return res
+        .status(401)
+        .send({ success: false, status: 401, message: 'Not authorized' })
     }
     const user = await User.findById(req.userId)
     if (!user) {
       return res
         .status(404)
-        .send({ success: true, status: 404, message: 'invalid user id' })
+        .send({ success: true, status: 404, message: 'Invalid user id' })
     }
 
     let oldEmails = poll.auth ?? []
@@ -88,7 +90,7 @@ exports.modifyPoll = async (req, res) => {
         poll.title,
         newPollTemplate(
           `${process.env.SITE_URL}/view/${poll._id}`,
-          '',
+
           poll.title,
           user.name,
           poll.startTime,
@@ -107,7 +109,7 @@ exports.modifyPoll = async (req, res) => {
 //   pollId,
 // }
 //
-// sends -> { success,message,poll}
+// returns -> { success,message,poll}
 exports.viewPoll = async (req, res) => {
   try {
     const poll = await Poll.findById(req.body.pollId).select('-_id -__v')
@@ -141,13 +143,18 @@ exports.viewPoll = async (req, res) => {
         user = await User.findById(req.userId)
         //checking if authentication is true and checking username and password in list
         if (!user || !(user.email in poll.auth)) {
-          return res.status(401).send({ success: false,status:401, message: "authentication failed'' })
+          return res.status(401).send({
+            success: false,
+            status: 401,
+            message: 'authentication failed',
+          })
         }
       }
       poll.auth = null
       res.status(200).send({ success: true, status: 200, poll, owner: false })
     } else
-      res.status(200).send({ status:200,
+      res.status(200).send({
+        status: 200,
         success: true,
         time: {
           startTime,
@@ -168,7 +175,7 @@ exports.viewPoll = async (req, res) => {
 //   modify : { field1: value1, ....}
 // }
 //
-// sends -> { success,message}
+// returns -> { success,message}
 exports.deletePoll = async (req, res) => {
   try {
     let oldPoll = await Poll.findById(req.body.pollId)
@@ -196,7 +203,7 @@ exports.deletePoll = async (req, res) => {
 //   pageNumber,
 //   numberOfItems
 // }
-// sends -> { success,message ,polls, count, prevPage, nextPage }
+// returns -> { success,message ,polls, count, prevPage, nextPage }
 exports.viewPrevPolls = async (req, res) => {
   try {
     const { pageNumber, numberOfItems } = req.body
@@ -215,13 +222,9 @@ exports.viewPrevPolls = async (req, res) => {
     let nextPage = true
     if (pageNumber === 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
-    return res.status(200).send({ status:200,
-      success: true,
-      polls,
-      count,
-      prevPage,
-      nextPage,
-    })
+    return res
+      .status(200)
+      .send({ status: 200, success: true, polls, count, prevPage, nextPage })
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }

@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken')
 //     username,
 //     password
 // }
-// sends -> {success,message,token}
+// returns -> {success,message,token}
 exports.signin = async (req, res) => {
   try {
     const { username, password } = req.body
@@ -79,7 +79,7 @@ exports.deletePoll = async (req, res) => {
 //   pollId,
 // }
 //
-// sends -> { success,message,poll}
+// returns -> { success,message,poll}
 exports.viewPoll = async (req, res) => {
   try {
     const poll = await Poll.findById(req.body.pollId)
@@ -102,7 +102,7 @@ exports.viewPoll = async (req, res) => {
 // req.body = {
 //     userId : //userId or username or email
 // }
-// sends -> {success,user,message}
+// returns -> {success,user,message}
 exports.viewUser = async (req, res) => {
   const { userId } = req.body
   try {
@@ -134,7 +134,7 @@ exports.viewUser = async (req, res) => {
 // req.body = {
 //     userId : //userId or username or email
 // }
-// sends -> {success,user,message}
+// returns -> {success,user,message}
 exports.deleteUser = async (req, res) => {
   const { userId } = req.body
   try {
@@ -168,7 +168,7 @@ exports.deleteUser = async (req, res) => {
 // req.body = {
 //     answerId
 // }
-// sends -> {success,answer,message}
+// returns -> {success,answer,message}
 exports.deleteAnswer = async (req, res) => {
   const { answerId } = req.body
   try {
@@ -193,7 +193,7 @@ exports.deleteAnswer = async (req, res) => {
 //   password*
 // }
 //
-// sends -> { success,message,poll}
+// returns -> { success,message,poll}
 exports.viewPoll = async (req, res) => {
   try {
     const poll = await Poll.findById(req.body.pollId)
@@ -218,7 +218,7 @@ exports.viewPoll = async (req, res) => {
 //   pageNumber,
 //   numberOfItems
 // }
-// sends -> { success,message ,poll, answers, count, prevPage, nextPage }
+// returns -> { success,message ,poll, answers, count, prevPage, nextPage }
 exports.viewAnswers = async (req, res) => {
   try {
     const { pollId, pageNumber, numberOfItems } = req.body
@@ -247,17 +247,15 @@ exports.viewAnswers = async (req, res) => {
     if (pageNumber === 0) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
 
-    return res
-      .status(200)
-      .send({
-        status: 200,
-        success: true,
-        poll,
-        answers,
-        count,
-        prevPage,
-        nextPage,
-      })
+    return res.status(200).send({
+      status: 200,
+      success: true,
+      poll,
+      answers,
+      count,
+      prevPage,
+      nextPage,
+    })
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }
@@ -270,7 +268,7 @@ exports.viewAnswers = async (req, res) => {
 //   modify : { field1: value1, ....}
 // }
 //
-// sends -> { success,message,poll}
+// returns -> { success,message,poll}
 exports.modifyPoll = async (req, res) => {
   try {
     let oldPoll = await Poll.findById(req.body.pollId)
@@ -294,7 +292,7 @@ exports.modifyPoll = async (req, res) => {
 //   modify : { field1: value1, ....}
 // }
 //
-// sends -> { success,message}
+// returns -> { success,message}
 exports.modifyUser = async (req, res) => {
   const { userId, modify } = req.body
   try {
@@ -334,7 +332,7 @@ exports.modifyUser = async (req, res) => {
 //   modify : { field1: value1, ....}
 // }
 //
-// sends -> { success,message,answer}
+// returns -> { success,message,answer}
 exports.modifyAnswer = async (req, res) => {
   const { answerId } = req.body
   try {
@@ -343,7 +341,7 @@ exports.modifyAnswer = async (req, res) => {
     if (!answer) {
       return es
         .status(404)
-        .send({ success: false, ststus: 404, message: 'Not found' })
+        .send({ success: false, status: 404, message: 'Not found' })
     }
 
     Object.entries(req.body.modify).forEach((arr) => {
@@ -363,7 +361,7 @@ exports.modifyAnswer = async (req, res) => {
 //   pageNumber,
 //   numberOfItems
 // }
-// sends -> { success, message, users, prevPage, nextPage, count }
+// returns -> { success, message, users, prevPage, nextPage, count }
 exports.getUsers = async (req, res) => {
   try {
     const { pageNumber, numberOfItems } = req.body
@@ -391,7 +389,7 @@ exports.getUsers = async (req, res) => {
 //   pageNumber,
 //   numberOfItems
 // }
-// sends -> { success, message, polls, prevPage, nextPage, count }
+// returns -> { success, message, polls, prevPage, nextPage, count }
 exports.getPolls = async (req, res) => {
   try {
     const { pageNumber, numberOfItems } = req.body
@@ -419,7 +417,7 @@ exports.getPolls = async (req, res) => {
 //   pollId,
 //   ans = { }
 // }
-// sends -> {success,message,answer}
+// returns -> {success,message,answer}
 exports.submitAnswer = async (req, res) => {
   try {
     const poll = await Poll.findById(req.body.pollId)
@@ -443,7 +441,7 @@ exports.submitAnswer = async (req, res) => {
 //   pageNumber,
 //   numberOfItems
 // }
-// sends -> { success,message ,poll, answers, count, prevPage, nextPage }
+// returns -> { success,message ,poll, answers, count, prevPage, nextPage }
 exports.viewPrevAns = async (req, res) => {
   try {
     const { pageNumber, numberOfItems, userId } = req.body
@@ -490,7 +488,7 @@ exports.viewPrevAns = async (req, res) => {
 //   pageNumber,
 //   numberOfItems
 // }
-// sends -> { success,message ,polls, count, prevPage, nextPage }
+// returns -> { success,message ,polls, count, prevPage, nextPage }
 exports.viewPrevPolls = async (req, res) => {
   try {
     const { pageNumber, numberOfItems, userId } = req.body
