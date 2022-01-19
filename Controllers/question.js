@@ -112,14 +112,15 @@ exports.modifyPoll = async (req, res) => {
 
 // route to view poll
 //
-// req.body = {
+// req.params = {
 //   pollId,
 // }
 //
 // returns -> { success,status,message,poll}
 exports.viewPoll = async (req, res) => {
+  const { pollId } = req.params
   try {
-    const poll = await Poll.findById(req.body.pollId).select('-_id -__v')
+    const poll = await Poll.findById(pollId).select('-_id -__v')
 
     //poll not found or poll deleted
     if (!poll || poll.deleted) {
@@ -205,14 +206,15 @@ exports.deletePoll = async (req, res) => {
 }
 
 // route to view previous polls of user
-// req.body ={
+// req.query ={
 //   pageNumber,
 //   numberOfItems
 // }
 // returns -> { success,message ,polls, count, prevPage, nextPage }
 exports.viewPrevPolls = async (req, res) => {
   try {
-    const { pageNumber, numberOfItems } = req.body
+    const { pageNumber, numberOfItems } = req.query
+    console.log({ pageNumber, numberOfItems })
     pageNumber = pageNumber ?? 1
     numberOfItems = numberOfItems ?? 10
     const polls = await Poll.find({ createdBy: mongodb.ObjectID(req.userId) })

@@ -81,15 +81,18 @@ exports.submitAnswer = async (req, res) => {
 
 // route to view answer
 // creator of poll
-// req.body ={
-//   pollId,
+// req.params ={
+//   pollId
+//  }
+// req.query ={
 //   pageNumber,
 //   numberOfItems
 // }
 // returns -> { success,message ,poll, answers, count, prevPage, nextPage }
 exports.viewAnswers = async (req, res) => {
   try {
-    const { pollId, pageNumber, numberOfItems } = req.body
+    const { pollId } = req.params
+    const { pageNumber, numberOfItems } = req.query
     pageNumber = pageNumber ?? 1
     numberOfItems = numberOfItems ?? 10
     const poll = await Poll.findById(pollId)
@@ -131,14 +134,14 @@ exports.viewAnswers = async (req, res) => {
 
 // route to view previous answers of user
 // creator of poll
-// req.body ={
+// req.query ={
 //   pageNumber,
 //   numberOfItems
 // }
 // returns -> { success,message ,poll, answers, count, prevPage, nextPage }
 exports.viewPrevAns = async (req, res) => {
   try {
-    const { pageNumber, numberOfItems } = req.body
+    const { pageNumber, numberOfItems } = req.query
     pageNumber = pageNumber ?? 1
     numberOfItems = numberOfItems ?? 10
     const answers = await Answer.find({
@@ -206,12 +209,12 @@ exports.saveDraftAns = async (req, res) => {
 // route to view draft answer
 // signed in users
 //
-// req.body = {
-//   pollId,
-//   ans: {},
+// req.params = {
+//   pollId
 // }
-// returns -> {success,status,message}
+// returns -> {success,status,message,answer}
 exports.viewDraftAns = async (req, res) => {
+  const { pollId } = req.params
   try {
     if (req.userId) {
       return res

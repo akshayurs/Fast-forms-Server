@@ -7,7 +7,12 @@ const app = express()
 const router = require('./router')
 
 const mongoose = require('mongoose')
-mongoose.connect(process.env.MONGO_URI)
+
+let options = {}
+if (process.env.ENVIRONMENT == 'development') {
+  options = { family: 4 }
+}
+mongoose.connect(process.env.MONGO_URI, options)
 
 const PORT = process.env.PORT || 5000
 

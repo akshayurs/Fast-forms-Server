@@ -112,3 +112,6 @@ Content-Type: application/json
 {
     "pollId": "61dc29b7f1dd9c7dcef891fc"
 }
+
+###
+GET http://localhost:5000/userpolls/?pageNumber=1&numberOfItems=10

@@ -43,11 +43,7 @@ returns -> {success, message}
 - Check existing user
 
 ```js
-GET /userexists
-
-body = {
-    username
-}
+GET /userexists/:username
 
 returns -> { success, message, exists}
 ```
@@ -136,7 +132,7 @@ returns -> {success,status,message}
 - view poll
 
 ```js
-GET /poll
+GET /poll/:pollId
 
 body = {
   pollId,
@@ -161,7 +157,7 @@ returns -> {success,status,message}
 - view previous polls of user
 
 ```js
-GET /userpolls
+GET /userpolls/?pageNumber=1&numberOfItems=10
 
 body = {
   pageNumber,
@@ -187,20 +183,15 @@ returns -> {success,status,message}
 - view answer
 
 ```js
-GET /answer
+GET /answer/:pollId?pageNumber=1&numberofItems=10
 
-body = {
-  pollId,
-  pageNumber,
-  numberofItems
-}
 returns -> {success ,message ,poll ,answers ,count ,prevPage ,nextPage }
 ```
 
 - view previous answers of user
 
 ```js
-GET /userans
+GET /userans?pageNumber=1numberOfItems=10
 
 body = {
   pageNumber,
@@ -224,13 +215,9 @@ returns -> {success,status,message}
 - view draft answer
 
 ```js
-GET /draft
+GET /draft/:pollId
 
-body = {
-  pollId,
-  ans: {},
-}
-returns -> {success,status,message}
+returns -> {success,status,message,answer}
 ```
 
 ### User details :

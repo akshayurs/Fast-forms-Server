@@ -144,17 +144,17 @@ exports.changePassword = async (req, res) => {
 //}
 // returns - > {success, status,message}
 exports.resetPasswordReq = async (req, res) => {
-  const { userId } = req.body
+  const { username } = req.body
   try {
     let objectId = null
     if (
-      typeof userId == 'string' &&
-      (userId.length == 24 || userId.length == 12)
+      typeof username == 'string' &&
+      (username.length == 24 || username.length == 12)
     ) {
-      objectId = mongodb.ObjectId(userId)
+      objectId = mongodb.ObjectId(username)
     }
     const user = await User.findOne({
-      $or: [{ email: userId }, { username: userId }, { _id: objectId }],
+      $or: [{ email: username }, { username }, { _id: objectId }],
     })
     //user not found
     if (!user) {
@@ -246,7 +246,7 @@ exports.resetPassword = async (req, res) => {
 //
 // returns -> { success: true, status, message, exists}
 exports.userExists = async (req, res) => {
-  const { username } = req.body
+  const { username } = req.params
   try {
     const user = await User.findOne({ username })
     if (!user) {

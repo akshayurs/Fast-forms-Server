@@ -75,14 +75,15 @@ exports.deletePoll = async (req, res) => {
 
 // route to view poll
 //
-// req.body = {
+// req.params = {
 //   pollId,
 // }
 //
 // returns -> { success,message,poll}
 exports.viewPoll = async (req, res) => {
+  const { pollId } = req.params
   try {
-    const poll = await Poll.findById(req.body.pollId)
+    const poll = await Poll.findById(pollId)
 
     //poll not found
     if (!poll) {
@@ -104,7 +105,7 @@ exports.viewPoll = async (req, res) => {
 // }
 // returns -> {success,user,message}
 exports.viewUser = async (req, res) => {
-  const { userId } = req.body
+  const { userId } = req.parsms
   try {
     let objectId = null
     if (
@@ -213,15 +214,11 @@ exports.viewPoll = async (req, res) => {
 }
 
 // route to view all answers of single poll
-// req.body ={
-//   pollId,
-//   pageNumber,
-//   numberOfItems
-// }
 // returns -> { success,message ,poll, answers, count, prevPage, nextPage }
 exports.viewAnswers = async (req, res) => {
   try {
-    const { pollId, pageNumber, numberOfItems } = req.body
+    const { pageNumber, numberOfItems } = req.query
+    const { pollId } = req.params
     pageNumber = pageNumber ?? 1
     numberOfItems = numberOfItems ?? 10
     const poll = await Poll.findById(pollId)
@@ -357,14 +354,14 @@ exports.modifyAnswer = async (req, res) => {
 }
 
 // route to view users
-// req.body ={
+// req.query ={
 //   pageNumber,
 //   numberOfItems
 // }
 // returns -> { success, message, users, prevPage, nextPage, count }
 exports.getUsers = async (req, res) => {
   try {
-    const { pageNumber, numberOfItems } = req.body
+    const { pageNumber, numberOfItems } = req.query
     pageNumber = pageNumber ?? 1
     numberOfItems = numberOfItems ?? 10
     const users = await User.find()
@@ -392,7 +389,7 @@ exports.getUsers = async (req, res) => {
 // returns -> { success, message, polls, prevPage, nextPage, count }
 exports.getPolls = async (req, res) => {
   try {
-    const { pageNumber, numberOfItems } = req.body
+    const { pageNumber, numberOfItems } = req.query
     pageNumber = pageNumber ?? 1
     numberOfItems = numberOfItems ?? 10
     const polls = await Poll.find()
@@ -436,15 +433,18 @@ exports.submitAnswer = async (req, res) => {
 
 // route to view previous answers of user
 // creator of poll
-// req.body ={
+// req.params ={
 //   userId // id or username or email
+// }
+// req.query={
 //   pageNumber,
 //   numberOfItems
 // }
 // returns -> { success,message ,poll, answers, count, prevPage, nextPage }
 exports.viewPrevAns = async (req, res) => {
   try {
-    const { pageNumber, numberOfItems, userId } = req.body
+    const { pageNumber, numberOfItems } = req.body
+    const { userId } = req.params
     pageNumber = pageNumber ?? 1
     numberOfItems = numberOfItems ?? 10
     if (mongodb.ObjectID.isValid(userId)) {
@@ -483,15 +483,18 @@ exports.viewPrevAns = async (req, res) => {
 
 // route to view previous polls of user
 // creator of poll
-// req.body ={
-//   userId
+// req.query ={
 //   pageNumber,
 //   numberOfItems
 // }
+//  req.params={
+//   userId
+//}
 // returns -> { success,message ,polls, count, prevPage, nextPage }
 exports.viewPrevPolls = async (req, res) => {
   try {
-    const { pageNumber, numberOfItems, userId } = req.body
+    const { pageNumber, numberOfItems } = req.query
+    const { userId } = req.params
     pageNumber = pageNumber ?? 1
     numberOfItems = numberOfItems ?? 10
     if (mongodb.ObjectID.isValid(userId)) {
