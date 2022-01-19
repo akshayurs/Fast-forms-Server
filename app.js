@@ -6,6 +6,9 @@ const express = require('express')
 const app = express()
 const router = require('./router')
 
+const cors = require('cors')
+app.use(cors())
+
 const mongoose = require('mongoose')
 
 let options = {}
