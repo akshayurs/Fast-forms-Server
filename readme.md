@@ -102,12 +102,26 @@ body = {
 returns -> {success,message}
 ```
 
-- To get username, name, email
+- Get username, name, email
 
 ```js
 GET /mydetails
 
 returns -> {success,message,user}
+```
+
+- Modify user details
+
+```js
+POST /modifydetails
+
+body = {
+  usermane,//optional
+  name,//optional
+  password//optional
+}
+
+returns -> {success,message}
 ```
 
 ### Poll Routes

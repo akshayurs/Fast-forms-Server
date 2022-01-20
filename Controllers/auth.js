@@ -303,3 +303,59 @@ exports.myDetails = async (req, res) => {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
+
+// route to modify user
+//
+// req.body = {
+//    field1: value1,
+//    field2: value2,...
+// }
+//
+// returns -> { success,message}
+exports.modifyDetails = async (req, res) => {
+  const { username, name, email } = req.body
+  const userId = req.userId
+
+  try {
+    let user = await User.findById(userId)
+
+    if (!user) {
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'Not found' })
+    }
+
+    if (email) {
+      const response = await fetch(
+        'https://open.kickbox.io/v1/disposable/' + req.body.email
+      )
+
+      if (response.status === 200) {
+        const data = await response.json()
+        if (data.disposable) {
+          return res.status(400).send({
+            success: false,
+            status: 400,
+            message: 'please provide your original email',
+          })
+        }
+      }
+      user.email = email
+    }
+    if (username) {
+      const existingUser = await User.findOne({ username })
+      if (existingUser) {
+        throw new Error('username not available')
+      }
+      user.username = username
+    }
+    if (name) user.name = name
+    await user.save()
+    console.log(user)
+    res
+      .status(200)
+      .send({ success: true, status: 200, message: 'Details Updated' })
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}

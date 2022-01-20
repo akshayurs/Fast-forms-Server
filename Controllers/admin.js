@@ -307,11 +307,11 @@ exports.modifyUser = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .send({ success: false, ststus: 404, message: 'Not found' })
+        .send({ success: false, status: 404, message: 'Not found' })
     }
 
     Object.entries(modify).forEach((arr) => {
-      oldPoll[arr[0]] = arr[1]
+      user[arr[0]] = arr[1]
     })
 
     await user.save()

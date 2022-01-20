@@ -14,6 +14,7 @@ const {
   checkResetToken,
   resetPassword,
   myDetails,
+  modifyDetails,
 } = require('./Controllers/auth')
 
 const {
@@ -49,6 +50,7 @@ router.post('/resetPasswordReq', resetPasswordReq)
 router.get('/resetpassword/:token', checkResetToken)
 router.post('/resetpassword', resetPassword)
 router.get('/mydetails', isAuthorized, myDetails)
+router.post('/modifydetails', isAuthorized, modifyDetails)
 
 // poll routes
 router.post('/poll', isAuthorized, createPoll)
