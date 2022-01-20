@@ -7,7 +7,7 @@ Content-Type: application/json
     "username":"newausera1",
     "name":"im checking email user",
     "password":"password",
-    "email":"fvlkxqudlnxce@frederictonlawyer.com"
+    "email":"fvlkxqudlnxce@gmail.com"
 }
 
 ###
@@ -16,7 +16,7 @@ Content-Type: application/json
 
 {
     "password":"password", 
-    "username":"newuser1"
+    "username":"fvlkxqudlnxce@gmail.com"
 }
 
 ###
@@ -114,4 +114,4 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:5000/userpolls/?pageNumber=1&numberOfItems=10
+GET http://localhost:5000/mydetails

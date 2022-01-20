@@ -64,6 +64,7 @@ exports.signup = async (req, res) => {
     const response = await fetch(
       'https://open.kickbox.io/v1/disposable/' + req.body.email
     )
+
     if (response.status === 200) {
       const data = await response.json()
       if (data.disposable) {
@@ -277,6 +278,27 @@ exports.verifyAccount = async (req, res) => {
     res
       .status(200)
       .send({ success: true, status: 200, message: 'account verified' })
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}
+
+// route to get user details
+// returns -> {success, user, message}
+exports.myDetails = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select({
+      username: 1,
+      name: 1,
+      email: 1,
+    })
+    if (!user) {
+      res
+        .status(404)
+        .send({ success: false, status: 404, message: 'Not found' })
+      return
+    }
+    res.send({ success: true, message: 'Your details', user })
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }

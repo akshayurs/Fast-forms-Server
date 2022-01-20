@@ -13,6 +13,7 @@ const {
   resetPasswordReq,
   checkResetToken,
   resetPassword,
+  myDetails,
 } = require('./Controllers/auth')
 
 const {
@@ -47,6 +48,7 @@ router.get('/verify/:token', verifyAccount)
 router.post('/resetPasswordReq', resetPasswordReq)
 router.get('/resetpassword/:token', checkResetToken)
 router.post('/resetpassword', resetPassword)
+router.get('/mydetails', isAuthorized, myDetails)
 
 // poll routes
 router.post('/poll', isAuthorized, createPoll)

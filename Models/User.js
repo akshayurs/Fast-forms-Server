@@ -38,8 +38,7 @@ const UserSchema = new mongoose.Schema({
   },
   verified: {
     type: Boolean,
-    default: true,
-    // TODO: false
+    default: false,
   },
   passwordResetToken: {
     type: String,

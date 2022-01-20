@@ -92,7 +92,7 @@ returns -> {success, status, message}
 - reset password with reset password token
 
 ```js
-post /resetpassword
+POST /resetpassword
 
 body = {
   token,
@@ -100,6 +100,14 @@ body = {
 }
 
 returns -> {success,message}
+```
+
+- To get username, name, email
+
+```js
+GET /mydetails
+
+returns -> {success,message,user}
 ```
 
 ### Poll Routes
