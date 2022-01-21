@@ -19,11 +19,15 @@ exports.createPoll = async (req, res) => {
         message: 'Invalid user id',
       })
     }
-    const newPoll = await Poll.create({ createdBy: req.userId, ...req.body })
+
+    if (req.body.emails?.length > 0) {
+      req.body.emails = [...new Set(req.body.emails)]
+    }
+    const newPoll = await Poll.create({ ...req.body, createdBy: req.userId })
     res.status(200).send({ success: true, status: 200, newPoll })
     if (newPoll.sendEmails && newPoll.authReq && newPoll.auth.length > 0) {
       sendMail(
-        newPoll.auth,
+        newPoll.emails,
         newPoll.title,
         newPollTemplate(
           `${process.env.SITE_URL}/view/${newPoll._id}`,
@@ -71,9 +75,9 @@ exports.modifyPoll = async (req, res) => {
         .send({ success: true, status: 404, message: 'Invalid user id' })
     }
 
-    let oldEmails = poll.auth ?? []
+    let oldEmails = poll.emails ?? []
     let emailsModified = false
-    if (req.body.modify.auth) {
+    if (req.body.modify.emails) {
       emailsModified = true
     }
 
@@ -85,8 +89,8 @@ exports.modifyPoll = async (req, res) => {
     await poll.save()
     res.status(200).send({ success: true, status: 200, poll })
 
-    if (emailsModified && poll.sendEmails && poll.auth) {
-      const newEmails = poll.auth.filter((email) => {
+    if (emailsModified && poll.sendEmails && poll.emails) {
+      const newEmails = poll.emails.filter((email) => {
         if (!(email in oldEmails)) {
           return true
         }
@@ -150,7 +154,7 @@ exports.viewPoll = async (req, res) => {
       if (poll.authReq == true) {
         user = await User.findById(req.userId)
         //checking if authentication is true and checking username and password in list
-        if (!user || !(user.email in poll.auth)) {
+        if (!user || !(user.email in poll.emails)) {
           return res.status(401).send({
             success: false,
             status: 401,

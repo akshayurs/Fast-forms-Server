@@ -1,5 +1,12 @@
 # Fast Forms Api
 
+## Getting Started
+
+```shell
+npm install
+node app
+```
+
 ## API end points
 
 ### Authentication Routes
@@ -286,13 +293,12 @@ returns -> {success,status,message,answer}
 
 ```js
     createdBy: {
-    type: ObjectId,
-    ref: 'User',
-    required: true,
+      type: ObjectId,
+      ref: 'User',
+      required: true,
     },
     title: {
       type: String,
-
       minLength: 3,
       maxLength: 30,
       required: true,
@@ -310,19 +316,22 @@ returns -> {success,status,message,answer}
       type: Boolean,
       default: true,
     },
-    auth: {
-      type: [
-        {
-          email: {
-            type: String,
-            minLength: 3,
-            maxLength: 25,
-            required: true,
-          },
-        },
-      ],
-      maxItems: 500,
+     showStats: {
+      type: Boolean,
+      default: true,
     },
+   emails: {
+    type: [
+      {
+        type: String,
+        trim: true,
+        minLength: 3,
+        maxLength: 25,
+        required: true,
+      },
+    ],
+    maxItems: 500,
+  },
     reqFieldsToAns: {
       type: [
         {
@@ -332,7 +341,7 @@ returns -> {success,status,message,answer}
           },
           fieldType: {
             type: String,
-            enum: ['string', 'number', 'radio', 'checkbox', 'dropdown','datetime','datetime-local'],
+            enum: ['text','textarea', 'number', 'radio', 'checkbox', 'dropdown','date','datetime-local'],
             required: true,
           },
           title: {
@@ -362,7 +371,7 @@ returns -> {success,status,message,answer}
           },
           fieldType: {
             type: String,
-            enum: ['string', 'number', 'radio', 'checkbox', 'dropdown','datetime','datetime-local'],
+            enum: ['text','textarea', 'number', 'radio', 'checkbox', 'dropdown','date','datetime-local'],
             required: true,
           },
           title: {
@@ -383,8 +392,8 @@ returns -> {success,status,message,answer}
             },
           ],
           answer: {
-            type: Number,
-            min: 0,
+            type: String,
+            maxLength:50
           },
         },
       ],

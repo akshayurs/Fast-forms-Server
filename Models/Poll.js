@@ -25,16 +25,18 @@ const pollSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  auth: {
+  showStats: {
+    type: Boolean,
+    default: true,
+  },
+  emails: {
     type: [
       {
-        email: {
-          type: String,
-          trim: true,
-          minLength: 3,
-          maxLength: 25,
-          required: true,
-        },
+        type: String,
+        trim: true,
+        minLength: 3,
+        maxLength: 25,
+        required: true,
       },
     ],
     maxItems: 500,
@@ -48,7 +50,16 @@ const pollSchema = new mongoose.Schema({
         },
         fieldType: {
           type: String,
-          enum: ['string', 'number', 'radio', 'checkbox', 'dropdown','datetime','datetime-local'],
+          enum: [
+            'text',
+            'textarea',
+            'number',
+            'radio',
+            'checkbox',
+            'dropdown',
+            'date',
+            'datetime-local',
+          ],
           required: [true, 'Select question type'],
         },
         title: {
@@ -80,7 +91,16 @@ const pollSchema = new mongoose.Schema({
         },
         fieldType: {
           type: String,
-          enum: ['string', 'number', 'radio', 'checkbox', 'dropdown','datetime','datetime-local'],
+          enum: [
+            'text',
+            'textarea',
+            'number',
+            'radio',
+            'checkbox',
+            'dropdown',
+            'date',
+            'datetime-local',
+          ],
           required: [true, 'Select question type'],
         },
         title: {
@@ -104,8 +124,8 @@ const pollSchema = new mongoose.Schema({
           },
         ],
         answer: {
-          type: Number,
-          min: 0,
+          type: String,
+          maxLength: 50,
         },
       },
     ],

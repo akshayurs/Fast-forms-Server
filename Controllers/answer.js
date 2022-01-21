@@ -23,7 +23,7 @@ exports.submitAnswer = async (req, res) => {
     let user = null
     if (poll.authReq == true) {
       user = await User.findById(req.userId)
-      if (!user || !(user.email in poll.auth)) {
+      if (!user || !(user.email in poll.emails)) {
         return res.status(401).send({
           success: false,
           status: 401,
