@@ -297,6 +297,11 @@ returns -> {success,status,message,answer}
       maxLength: 30,
       required: true,
     },
+    des: {
+      type: String,
+      trim: true,
+      maxLength: 500,
+    },
     authReq: {
       type: Boolean,
       default: false,
@@ -327,7 +332,7 @@ returns -> {success,status,message,answer}
           },
           fieldType: {
             type: String,
-            enum: ['string', 'number', 'radio', 'checkbox', 'dropdown'],
+            enum: ['string', 'number', 'radio', 'checkbox', 'dropdown','datetime','datetime-local'],
             required: true,
           },
           title: {
@@ -357,7 +362,7 @@ returns -> {success,status,message,answer}
           },
           fieldType: {
             type: String,
-            enum: ['string', 'number', 'radio', 'checkbox', 'dropdown'],
+            enum: ['string', 'number', 'radio', 'checkbox', 'dropdown','datetime','datetime-local'],
             required: true,
           },
           title: {

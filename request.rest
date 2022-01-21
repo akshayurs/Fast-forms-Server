@@ -16,7 +16,7 @@ Content-Type: application/json
 
 {
     "password":"password", 
-    "username":"fvlkxqudlnxce@gmail.com"
+    "username":"newausera1"
 }
 
 ###

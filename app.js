@@ -7,7 +7,12 @@ const app = express()
 const router = require('./router')
 
 const cors = require('cors')
-app.use(cors())
+app.use(
+  cors({
+    origin: `${process.env.CORS_ORIGIN}`,
+    credentials: true,
+  })
+)
 
 const mongoose = require('mongoose')
 

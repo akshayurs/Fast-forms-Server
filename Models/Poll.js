@@ -12,6 +12,11 @@ const pollSchema = new mongoose.Schema({
     maxLength: 30,
     required: [true, 'Title is required for Poll'],
   },
+  des: {
+    type: String,
+    trim: true,
+    maxLength: 500,
+  },
   authReq: {
     type: Boolean,
     default: false,
@@ -43,7 +48,7 @@ const pollSchema = new mongoose.Schema({
         },
         fieldType: {
           type: String,
-          enum: ['string', 'number', 'radio', 'checkbox', 'dropdown'],
+          enum: ['string', 'number', 'radio', 'checkbox', 'dropdown','datetime','datetime-local'],
           required: [true, 'Select question type'],
         },
         title: {
@@ -75,7 +80,7 @@ const pollSchema = new mongoose.Schema({
         },
         fieldType: {
           type: String,
-          enum: ['string', 'number', 'radio', 'checkbox', 'dropdown'],
+          enum: ['string', 'number', 'radio', 'checkbox', 'dropdown','datetime','datetime-local'],
           required: [true, 'Select question type'],
         },
         title: {

@@ -15,6 +15,7 @@ const {
   resetPassword,
   myDetails,
   modifyDetails,
+  checkToken,
 } = require('./Controllers/auth')
 
 const {
@@ -36,7 +37,10 @@ const {
 const admin = require('./Controllers/admin')
 
 router.get('/', (req, res) => {
-  res.status(200).send({ success: true, message: 'fast forms server running' })
+  res
+    .status(200)
+
+    .send({ success: true, status: 200, message: 'fast forms server running' })
 })
 
 //auth routes
@@ -51,6 +55,7 @@ router.get('/resetpassword/:token', checkResetToken)
 router.post('/resetpassword', resetPassword)
 router.get('/mydetails', isAuthorized, myDetails)
 router.post('/modifydetails', isAuthorized, modifyDetails)
+router.get('/checktoken', isAuthorized, checkToken)
 
 // poll routes
 router.post('/poll', isAuthorized, createPoll)

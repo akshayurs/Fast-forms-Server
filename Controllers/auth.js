@@ -37,13 +37,17 @@ exports.signin = async (req, res) => {
       expiresIn: process.env.JWT_EXP,
     })
     res
+      .status(200)
       .cookie('token', token, {
         expires: new Date(
           Date.now() + process.env.JWT_COOKIE_EXP * 24 * 60 * 60 * 1000
         ),
+        sameSite: 'strict',
+        path: '/',
+        secure: true,
         httpOnly: true,
       })
-      .send({ success: true, token })
+      .send({ success: true, status: 200, token })
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }
@@ -298,7 +302,7 @@ exports.myDetails = async (req, res) => {
         .send({ success: false, status: 404, message: 'Not found' })
       return
     }
-    res.send({ success: true, message: 'Your details', user })
+    res.send({ success: true, status: 200, message: 'Your details', user })
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }
@@ -358,4 +362,11 @@ exports.modifyDetails = async (req, res) => {
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }
+}
+
+
+//route to check login
+// return -> {succuss, status, message}
+exports.checkToken=(req,res)=>{
+  res.status(200).send({success:true,status:200,message:"token valid"})
 }
