@@ -42,7 +42,7 @@ exports.signin = async (req, res) => {
         expires: new Date(
           Date.now() + process.env.JWT_COOKIE_EXP * 24 * 60 * 60 * 1000
         ),
-        sameSite: 'strict',
+        sameSite: 'none',
         path: '/',
         secure: true,
         httpOnly: true,
@@ -364,9 +364,8 @@ exports.modifyDetails = async (req, res) => {
   }
 }
 
-
 //route to check login
 // return -> {succuss, status, message}
-exports.checkToken=(req,res)=>{
-  res.status(200).send({success:true,status:200,message:"token valid"})
+exports.checkToken = (req, res) => {
+  res.status(200).send({ success: true, status: 200, message: 'token valid' })
 }
