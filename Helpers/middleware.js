@@ -39,7 +39,6 @@ exports.getUserId = (req, res, next) => {
     } else if (req.cookies.token) {
       token = req.cookies.token
     }
-
     if (token != null && token != '') {
       const decoded = jwt.verify(token, process.env.JWT_SECRET)
       req.userId = decoded.id

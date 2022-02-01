@@ -1,7 +1,8 @@
 const Poll = require('../Models/Poll')
 const User = require('../Models/User')
+const Answer = require('../Models/Answer')
 const { sendMail, newPollTemplate } = require('../Helpers/email')
-
+const mongodb = require('mongodb')
 // route to create poll
 // signed in users
 // req.body = {
@@ -91,7 +92,7 @@ exports.modifyPoll = async (req, res) => {
 
     if (emailsModified && poll.sendEmails && poll.emails) {
       const newEmails = poll.emails.filter((email) => {
-        if (!(email in oldEmails)) {
+        if (!oldEmails.includes(email)) {
           return true
         }
         return false
@@ -154,7 +155,7 @@ exports.viewPoll = async (req, res) => {
       if (poll.authReq == true) {
         user = await User.findById(req.userId)
         //checking if authentication is true and checking username and password in list
-        if (!user || !(user.email in poll.emails)) {
+        if (!req.userId || !user || !poll.emails.includes(user.email)) {
           return res.status(401).send({
             success: false,
             status: 401,
@@ -168,6 +169,11 @@ exports.viewPoll = async (req, res) => {
       res.status(200).send({
         status: 200,
         success: true,
+        poll: {
+          title: poll.title,
+          des: poll.des,
+          createdBy: poll.createdBy,
+        },
         time: {
           startTime,
           endTime,
@@ -217,8 +223,7 @@ exports.deletePoll = async (req, res) => {
 // returns -> { success,message ,polls, count, prevPage, nextPage }
 exports.viewPrevPolls = async (req, res) => {
   try {
-    const { pageNumber, numberOfItems } = req.query
-    console.log({ pageNumber, numberOfItems })
+    let { pageNumber, numberOfItems } = req.query
     pageNumber = pageNumber ?? 1
     numberOfItems = numberOfItems ?? 10
     const polls = await Poll.find({ createdBy: mongodb.ObjectID(req.userId) })
@@ -230,6 +235,38 @@ exports.viewPrevPolls = async (req, res) => {
       createdBy: mongodb.ObjectID(req.userId),
     }).exec()
 
+    let prevPage = true
+    let nextPage = true
+    if (pageNumber === 1) prevPage = false
+    if (count <= pageNumber * numberOfItems) nextPage = false
+    return res
+      .status(200)
+      .send({ status: 200, success: true, polls, count, prevPage, nextPage })
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}
+
+// route to view public polls
+// req.query ={
+//   pageNumber,
+//   numberOfItems
+// }
+// returns -> { success,message ,polls, count, prevPage, nextPage }
+exports.publicPolls = async (req, res) => {
+  try {
+    let { pageNumber, numberOfItems } = req.query
+    pageNumber = pageNumber ?? 1
+    numberOfItems = numberOfItems ?? 10
+    const polls = await Poll.find({ publicPoll: true })
+      .sort({ createdTime: -1 })
+      .skip((pageNumber - 1) * numberOfItems)
+      .limit(numberOfItems)
+      .populate('createdBy', { name: 1, username: 1, _id: 0 })
+
+    const count = await Poll.countDocuments({
+      createdBy: mongodb.ObjectID(req.userId),
+    }).exec()
     let prevPage = true
     let nextPage = true
     if (pageNumber === 1) prevPage = false

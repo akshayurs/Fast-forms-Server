@@ -17,6 +17,10 @@ const pollSchema = new mongoose.Schema({
     trim: true,
     maxLength: 500,
   },
+  publicPoll: {
+    type: Boolean,
+    default: false,
+  },
   authReq: {
     type: Boolean,
     default: false,

@@ -163,10 +163,6 @@ returns -> {success,status,message}
 ```js
 GET /poll/:pollId
 
-body = {
-  pollId,
-}
-
 returns -> {success,status,message,poll}
 ```
 
@@ -307,6 +303,10 @@ returns -> {success,status,message,answer}
       type: String,
       trim: true,
       maxLength: 500,
+    },
+    publicPoll: {
+      type: Boolean,
+      default: false,
     },
     authReq: {
       type: Boolean,

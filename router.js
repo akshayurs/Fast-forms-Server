@@ -24,6 +24,7 @@ const {
   viewPrevPolls,
   viewPoll,
   deletePoll,
+  publicPolls,
 } = require('./Controllers/question')
 
 const {
@@ -63,6 +64,7 @@ router.put('/poll', isAuthorized, modifyPoll)
 router.get('/poll/:pollId', getUserId, viewPoll)
 router.delete('/poll', isAuthorized, deletePoll)
 router.get('/userpolls', isAuthorized, viewPrevPolls)
+router.get('/publicpolls', publicPolls)
 
 // answer routes
 router.post('/answer', getUserId, submitAnswer)
