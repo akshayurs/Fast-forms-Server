@@ -241,7 +241,7 @@ exports.viewAnswers = async (req, res) => {
     let prevPage = true
     let nextPage = true
 
-    if (pageNumber === 0) prevPage = false
+    if (pageNumber == 0) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
 
     return res.status(200).send({
@@ -371,7 +371,7 @@ exports.getUsers = async (req, res) => {
     const count = await User.countDocuments({}).exec()
     let prevPage = true
     let nextPage = true
-    if (pageNumber === 1) prevPage = false
+    if (pageNumber == 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
     return res
       .status(200)
@@ -399,7 +399,7 @@ exports.getPolls = async (req, res) => {
     const count = await Poll.countDocuments({}).exec()
     let prevPage = true
     let nextPage = true
-    if (pageNumber === 1) prevPage = false
+    if (pageNumber == 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
     return res
       .status(200)
@@ -471,7 +471,7 @@ exports.viewPrevAns = async (req, res) => {
     }).exec()
     let prevPage = true
     let nextPage = true
-    if (pageNumber === 1) prevPage = false
+    if (pageNumber == 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
     return res
       .status(200)
@@ -521,7 +521,7 @@ exports.viewPrevPolls = async (req, res) => {
 
     let prevPage = true
     let nextPage = true
-    if (pageNumber === 1) prevPage = false
+    if (pageNumber == 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
     return res
       .status(200)

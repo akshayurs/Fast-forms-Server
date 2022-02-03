@@ -116,7 +116,7 @@ exports.viewAnswers = async (req, res) => {
     }).exec()
     let prevPage = true
     let nextPage = true
-    if (pageNumber === 1) prevPage = false
+    if (pageNumber == 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
     return res.status(200).send({
       status: 200,
@@ -155,7 +155,7 @@ exports.viewPrevAns = async (req, res) => {
     }).exec()
     let prevPage = true
     let nextPage = true
-    if (pageNumber === 1) prevPage = false
+    if (pageNumber == 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
     return res
       .status(200)

@@ -159,12 +159,26 @@ exports.viewPoll = async (req, res) => {
           return res.status(401).send({
             success: false,
             status: 401,
+            poll: {
+              title: poll.title,
+              des: poll.des,
+              createdBy: poll.createdBy,
+              startTime: poll.startTime,
+              endTime: poll.endTime,
+            },
+            pollStarted: false,
             message: 'authentication failed',
           })
         }
       }
       poll.auth = null
-      res.status(200).send({ success: true, status: 200, poll, owner: false })
+      res.status(200).send({
+        success: true,
+        status: 200,
+        poll,
+        pollStarted: true,
+        owner: false,
+      })
     } else
       res.status(200).send({
         status: 200,
@@ -173,11 +187,10 @@ exports.viewPoll = async (req, res) => {
           title: poll.title,
           des: poll.des,
           createdBy: poll.createdBy,
+          startTime: poll.startTime,
+          endTime: poll.endTime,
         },
-        time: {
-          startTime,
-          endTime,
-        },
+        pollStarted: false,
         owner: false,
         message: 'check the timings',
       })
@@ -237,7 +250,7 @@ exports.viewPrevPolls = async (req, res) => {
 
     let prevPage = true
     let nextPage = true
-    if (pageNumber === 1) prevPage = false
+    if (pageNumber == 1) prevPage = false
     if (count <= pageNumber * numberOfItems) nextPage = false
     return res
       .status(200)
@@ -259,6 +272,13 @@ exports.publicPolls = async (req, res) => {
     pageNumber = pageNumber ?? 1
     numberOfItems = numberOfItems ?? 10
     const polls = await Poll.find({ publicPoll: true })
+      .select({
+        title: 1,
+        des: 1,
+        createdBy: 1,
+        startTime: 1,
+        endTime: 1,
+      })
       .sort({ createdTime: -1 })
       .skip((pageNumber - 1) * numberOfItems)
       .limit(numberOfItems)
@@ -269,11 +289,20 @@ exports.publicPolls = async (req, res) => {
     }).exec()
     let prevPage = true
     let nextPage = true
-    if (pageNumber === 1) prevPage = false
+    if (pageNumber == 1) {
+      prevPage = false
+    }
+
     if (count <= pageNumber * numberOfItems) nextPage = false
-    return res
-      .status(200)
-      .send({ status: 200, success: true, polls, count, prevPage, nextPage })
+
+    return res.status(200).send({
+      status: 200,
+      success: true,
+      polls,
+      count,
+      prevPage,
+      nextPage,
+    })
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }

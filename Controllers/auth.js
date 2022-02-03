@@ -111,7 +111,12 @@ exports.signup = async (req, res) => {
 // route to sign out and clear cookies
 // returns -> {success:true , message}
 exports.signout = async (req, res) => {
-  res.clearCookie('token')
+  res.clearCookie('token', {
+    sameSite: 'none',
+    path: '/',
+    secure: true,
+    httpOnly: true,
+  })
   res.status(200).send({ success: true, status: 200, message: 'Signed out' })
 }
 
