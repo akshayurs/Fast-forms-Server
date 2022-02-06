@@ -20,7 +20,7 @@ const AnswerSchema = new mongoose.Schema({
           required: true,
         },
         ans: {
-          type: String,
+          type: Object,
           required: true,
         },
       },
@@ -35,7 +35,7 @@ const AnswerSchema = new mongoose.Schema({
           required: true,
         },
         ans: {
-          type: String,
+          type: Object,
           required: true,
         },
       },
@@ -52,6 +52,7 @@ const AnswerSchema = new mongoose.Schema({
   },
   modifiedTime: {
     type: Date,
+    default: Date.now(),
   },
 })
 

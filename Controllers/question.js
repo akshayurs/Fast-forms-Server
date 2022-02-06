@@ -125,7 +125,9 @@ exports.modifyPoll = async (req, res) => {
 exports.viewPoll = async (req, res) => {
   const { pollId } = req.params
   try {
-    const poll = await Poll.findById(pollId).select('-_id -__v')
+    const poll = await Poll.findById(pollId)
+      .select('-_id -__v')
+      .populate('createdBy', { name: 1, username: 1 })
 
     //poll not found or poll deleted
     if (!poll || poll.deleted) {
@@ -150,7 +152,7 @@ exports.viewPoll = async (req, res) => {
     })
 
     // checking for live poll
-    if (now > startTime && now < endTime) {
+    if (now > startTime) {
       let user = null
       if (poll.authReq == true) {
         user = await User.findById(req.userId)

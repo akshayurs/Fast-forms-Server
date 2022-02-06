@@ -2,7 +2,7 @@ const Poll = require('../Models/Poll')
 const User = require('../Models/User')
 const Answer = require('../Models/Answer')
 const DraftAnswer = require('../Models/DraftAnswer')
-
+const mongodb = require('mongodb')
 // route to submit answer to poll
 // req.body={
 //     pollId,
@@ -21,8 +21,8 @@ exports.submitAnswer = async (req, res) => {
     //checking if authentication is true then checking username and password in list
 
     let user = null
+    user = await User.findById(req.userId)
     if (poll.authReq == true) {
-      user = await User.findById(req.userId)
       if (!user || !poll.emails.includes(user.email)) {
         return res.status(401).send({
           success: false,
@@ -44,17 +44,26 @@ exports.submitAnswer = async (req, res) => {
       })
     }
     //checking for previous submits
-    if (poll.authReq) {
+    if (req.userId) {
       const oldAnswer = await Answer.findOne({
-        pollId: req.body.pollId,
+        pollId: mongodb.ObjectID(req.body.pollId),
         submittedBy: mongodb.ObjectID(req.userId),
       })
       if (oldAnswer) {
+        if (!poll.ansEditable) {
+          return res
+            .status(400)
+            .send({ success: false, status: 400, message: 'already submitted' })
+        }
+        oldAnswer.reqFieldsAns = req.body.ans.reqFieldsAns
+        oldAnswer.queFieldsAns = req.body.ans.queFieldsAns
+        await oldAnswer.save()
         return res
-          .status(400)
-          .send({ success: false, status: 400, message: 'already submitted' })
+          .status(200)
+          .send({ success: true, status: 200, message: 'Answer Modified' })
       }
     }
+
     let answer
     if (req.userId) {
       answer = await Answer.create({
@@ -69,11 +78,35 @@ exports.submitAnswer = async (req, res) => {
         ...req.body.ans,
       })
     }
-    res.status(200).send({ success: true, status: 200, answer })
     await DraftAnswer.findOneAndDelete({
+      pollId: mongodb.ObjectID(req.body.pollId),
+      submittedBy: mongodb.ObjectID(req.userId),
+    })
+    return res.status(200).send({ success: true, status: 200, answer })
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}
+
+// route to view draft answer
+// signed in users
+//
+// req.params = {
+//   pollId
+// }
+// returns -> {success,status,message,answer}
+exports.viewAns = async (req, res) => {
+  const { pollId } = req.params
+  try {
+    let answer = await Answer.findOne({
       pollId: mongodb.ObjectID(pollId),
       submittedBy: mongodb.ObjectID(req.userId),
     })
+
+    if (!answer) {
+      return res.status(404).send({ success: false, status: 404 })
+    }
+    return res.status(200).send({ success: true, status: 200, answer })
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }
@@ -141,7 +174,7 @@ exports.viewAnswers = async (req, res) => {
 // returns -> { success,message ,poll, answers, count, prevPage, nextPage }
 exports.viewPrevAns = async (req, res) => {
   try {
-    const { pageNumber, numberOfItems } = req.query
+    let { pageNumber, numberOfItems } = req.query
     pageNumber = pageNumber ?? 1
     numberOfItems = numberOfItems ?? 10
     const answers = await Answer.find({
@@ -150,6 +183,8 @@ exports.viewPrevAns = async (req, res) => {
       .sort({ createdTime: -1 })
       .skip((pageNumber - 1) * numberOfItems)
       .limit(numberOfItems)
+      .populate('pollId', { createdBy: 1, title: 1, des: 1 })
+
     const count = await Answer.countDocuments({
       submittedBy: mongodb.ObjectID(req.userId),
     }).exec()

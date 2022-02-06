@@ -205,12 +205,20 @@ body = {
 returns -> {success,status,message}
 ```
 
-- view answer
+- view answer by creator
 
 ```js
 GET /answer/:pollId?pageNumber=1&numberofItems=10
 
 returns -> {success ,message ,poll ,answers ,count ,prevPage ,nextPage }
+```
+
+- view answer by user
+
+```js
+GET /myanswer/:pollId
+
+returns -> {success ,message  ,answer }
 ```
 
 - view previous answers of user

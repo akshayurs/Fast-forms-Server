@@ -33,6 +33,7 @@ const {
   viewPrevAns,
   saveDraftAns,
   viewDraftAns,
+  viewAns,
 } = require('./Controllers/answer')
 
 const admin = require('./Controllers/admin')
@@ -69,6 +70,7 @@ router.get('/publicpolls', publicPolls)
 // answer routes
 router.post('/answer', getUserId, submitAnswer)
 router.get('/answers/:pollId', isAuthorized, viewAnswers)
+router.get('/myanswer/:pollId', isAuthorized, viewAns)
 router.get('/userans', isAuthorized, viewPrevAns)
 router.post('/draft', isAuthorized, saveDraftAns)
 router.get('/draft/:pollId', isAuthorized, viewDraftAns)
