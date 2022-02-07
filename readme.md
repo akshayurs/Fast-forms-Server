@@ -191,6 +191,22 @@ body = {
 returns -> {success, message, polls, count, prevPage, nextPage }
 ```
 
+- View Public Polls
+
+```js
+GET /publicpolls/?pageNumber=1&numberOfItems=10
+
+returns-> {success, message, polls, count, prevPage, nextPage }
+```
+
+- Search Public polls
+
+```js
+GET /publicpolls/:text
+
+returns -> {success,message,polls}
+```
+
 ### Answer Routes
 
 - submit answer to poll
