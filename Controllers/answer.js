@@ -266,3 +266,39 @@ exports.viewDraftAns = async (req, res) => {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }
 }
+
+//route to get statistics of answer
+// req.params = {
+// pollId
+//}
+exports.getStats = async (req, res) => {
+  try {
+    const { pollId } = req.params
+    const poll = await Poll.findById(pollId)
+    if (!poll) {
+      res
+        .status(404)
+        .send({ success: false, status: 404, message: 'Poll not found' })
+    }
+    if (!(poll.createdBy.equals(req.userId) || poll.showStats)) {
+      return res
+        .status(401)
+        .send({ success: false, status: 401, message: 'Not authorized' })
+    }
+    const answers = await Answer.find(
+      {
+        pollId: mongodb.ObjectId(pollId),
+      },
+      poll.createdBy.equals(req.userId) ? '' : '-submittedBy'
+    )
+    res.status(200).send({
+      success: true,
+      status: 200,
+      answers,
+      poll,
+      owner: poll.createdBy.equals(req.userId),
+    })
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}
