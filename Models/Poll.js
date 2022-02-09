@@ -175,6 +175,10 @@ const pollSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  answersCount: {
+    type: Number,
+    default: 0,
+  },
 })
 
 module.exports = mongoose.model('Poll', pollSchema)

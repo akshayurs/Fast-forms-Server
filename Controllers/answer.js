@@ -64,6 +64,8 @@ exports.submitAnswer = async (req, res) => {
       }
     }
 
+    poll.answersCount = poll.answersCount + 1
+    await poll.save()
     let answer
     if (req.userId) {
       answer = await Answer.create({
@@ -82,7 +84,9 @@ exports.submitAnswer = async (req, res) => {
       pollId: mongodb.ObjectID(req.body.pollId),
       submittedBy: mongodb.ObjectID(req.userId),
     })
-    return res.status(200).send({ success: true, status: 200, answer })
+    return res
+      .status(200)
+      .send({ success: true, status: 200, answer, message: 'Answer Submitted' })
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }
@@ -183,7 +187,13 @@ exports.viewPrevAns = async (req, res) => {
       .sort({ createdTime: -1 })
       .skip((pageNumber - 1) * numberOfItems)
       .limit(numberOfItems)
-      .populate('pollId', { createdBy: 1, title: 1, des: 1 })
+      .populate('pollId', {
+        createdBy: 1,
+        title: 1,
+        des: 1,
+        ansEditable: 1,
+        showStats: 1,
+      })
 
     const count = await Answer.countDocuments({
       submittedBy: mongodb.ObjectID(req.userId),
@@ -195,6 +205,40 @@ exports.viewPrevAns = async (req, res) => {
     return res
       .status(200)
       .send({ status: 200, success: true, answers, count, prevPage, nextPage })
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}
+
+// route to submit answer to poll
+// req.params={
+//     answerId,
+//     ans : {}
+// }
+// returns -> {success,status,message}
+exports.deleteAnswer = async (req, res) => {
+  try {
+    const { answerId } = req.params
+    const answer = await Answer.findById(answerId)
+    // poll not found
+    if (!answer) {
+      return res
+        .status(404)
+        .send({ success: false, status: 404, message: 'Incorrect id' })
+    }
+    const poll = await Poll.findById(answer.pollId)
+
+    if (!poll.ansEditable || !answer.submittedBy.equals(req.userId)) {
+      return res
+        .status(401)
+        .send({ success: false, status: 401, message: 'Not Authorized' })
+    }
+    poll.answersCount = poll.answersCount - 1
+    poll.save()
+    await Answer.findByIdAndDelete(answerId)
+    return res
+      .status(200)
+      .send({ success: true, status: 200, answer, message: 'Answer Deleted' })
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }
@@ -289,8 +333,9 @@ exports.getStats = async (req, res) => {
       {
         pollId: mongodb.ObjectId(pollId),
       },
-      poll.createdBy.equals(req.userId) ? '' : '-submittedBy'
+      poll.createdBy.equals(req.userId) ? '' : '-submittedBy -reqFieldsAns'
     )
+
     res.status(200).send({
       success: true,
       status: 200,
