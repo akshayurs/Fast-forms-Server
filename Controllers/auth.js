@@ -6,6 +6,26 @@ const {
   accountConfirmTemplate,
   passwordResetTemplate,
 } = require('../Helpers/email')
+const { OAuth2Client } = require('google-auth-library')
+const client = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID)
+
+function sendUserToken(res, id) {
+  const token = jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXP,
+  })
+  res
+    .status(200)
+    .cookie('token', token, {
+      expires: new Date(
+        Date.now() + process.env.JWT_COOKIE_EXP * 24 * 60 * 60 * 1000
+      ),
+      sameSite: 'none',
+      path: '/',
+      secure: true,
+      httpOnly: true,
+    })
+    .send({ success: true, status: 200, token })
+}
 
 // route to sign in user and sending token
 //
@@ -21,7 +41,7 @@ exports.signin = async (req, res) => {
     const user = await User.findOne({
       $or: [{ username }, { email: username }],
     }).select({ password: 1, verified: 1 })
-    if (!user || !user.validatePassword(password)) {
+    if (!user || !user.validatePassword(password) || user.isGoogleUser) {
       res
         .status(401)
         .send({ success: false, status: 401, message: 'Invalid credentials' })
@@ -33,21 +53,7 @@ exports.signin = async (req, res) => {
         .send({ success: false, status: 400, message: 'Account not verified' })
     }
 
-    const token = jwt.sign({ id: user['_id'] }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXP,
-    })
-    res
-      .status(200)
-      .cookie('token', token, {
-        expires: new Date(
-          Date.now() + process.env.JWT_COOKIE_EXP * 24 * 60 * 60 * 1000
-        ),
-        sameSite: 'none',
-        path: '/',
-        secure: true,
-        httpOnly: true,
-      })
-      .send({ success: true, status: 200, token })
+    return sendUserToken(res, user['_id'])
   } catch (err) {
     res.status(500).send({ success: false, status: 500, message: err.message })
   }
@@ -79,7 +85,11 @@ exports.signup = async (req, res) => {
         })
       }
     }
-    const user = await User.create(req.body)
+    const user = await User.create({
+      ...req.body,
+      isGoogleUser: false,
+      verified: false,
+    })
     const token = jwt.sign(
       { notVerifiedUser: user['_id'] },
       process.env.JWT_SECRET,
@@ -120,6 +130,61 @@ exports.signout = async (req, res) => {
   res.status(200).send({ success: true, status: 200, message: 'Signed out' })
 }
 
+// Route to google signin
+// req.body={
+//  token
+//}
+exports.googleSignin = async (req, res) => {
+  try {
+    const { token, username } = req.body
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.CLIENT_ID,
+    })
+    const { name, email, email_verified } = ticket.getPayload()
+    const user = await User.findOne({ email })
+    if (!user) {
+      if (username) {
+        const oldUser = await User.findOne({ username })
+        if (!oldUser) {
+          const user = await User.create({
+            username,
+            email,
+            name,
+            password: 'not valid for google user',
+            isGoogleUser: true,
+          })
+          return sendUserToken(res, user['_id'])
+        } else {
+          res.status(400).send({
+            status: 400,
+            message: 'username already exist',
+            success: false,
+          })
+        }
+      } else {
+        return res.status(200).send({
+          status: 200,
+          success: false,
+          message: 'Provide Username',
+          token,
+        })
+      }
+    } else {
+      if (user.isGoogleUser) {
+        return sendUserToken(res, user['_id'])
+      } else {
+        return res.status(401).send({
+          status: 401,
+          message: 'Signin with your email id',
+          success: false,
+        })
+      }
+    }
+  } catch (err) {
+    res.status(500).send({ success: false, status: 500, message: err.message })
+  }
+}
 //route to change password
 // for signed in users
 // req.body = {
@@ -132,7 +197,7 @@ exports.changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body
   try {
     const user = await User.findById(req.userId).select({ password: 1 })
-    if (!user || !user.validatePassword(oldPassword)) {
+    if (!user || !user.validatePassword(oldPassword) || user.isGoogleUser) {
       return res
         .status(401)
         .send({ success: false, status: 401, message: 'Invalid credentials' })
@@ -167,7 +232,7 @@ exports.resetPasswordReq = async (req, res) => {
       $or: [{ email: username }, { username }, { _id: objectId }],
     })
     //user not found
-    if (!user) {
+    if (!user || user.isGoogleUser) {
       return res
         .status(404)
         .send({ success: false, status: 404, message: 'Not found' })
@@ -300,6 +365,7 @@ exports.myDetails = async (req, res) => {
       username: 1,
       name: 1,
       email: 1,
+      isGoogleUser: 1,
     })
     if (!user) {
       res

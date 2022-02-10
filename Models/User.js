@@ -43,10 +43,14 @@ const UserSchema = new mongoose.Schema({
   passwordResetToken: {
     type: String,
   },
+  isGoogleUser: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 UserSchema.pre('save', function (next) {
-  if (this.isModified('email')) {
+  if (this.isModified('email') && !this.isGoogleUser) {
     this.verified = false
     this.createdDate = Date.now()
   }

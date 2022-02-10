@@ -250,6 +250,7 @@ exports.viewPrevPolls = async (req, res) => {
       createdBy: mongodb.ObjectID(req.userId),
       deleted: false,
     })
+      .select({ title: 1, des: 1, startTime: 1, endTime: 1, queEditable: 1 })
       .sort({ createdTime: -1 })
       .skip((pageNumber - 1) * numberOfItems)
       .limit(numberOfItems)
@@ -288,6 +289,7 @@ exports.publicPolls = async (req, res) => {
         createdBy: 1,
         startTime: 1,
         endTime: 1,
+        showStats: 1,
       })
       .sort({ createdTime: -1 })
       .skip((pageNumber - 1) * numberOfItems)

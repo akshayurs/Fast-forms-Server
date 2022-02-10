@@ -16,6 +16,7 @@ const {
   myDetails,
   modifyDetails,
   checkToken,
+  googleSignin,
 } = require('./Controllers/auth')
 
 const {
@@ -51,6 +52,7 @@ router.get('/', (req, res) => {
 //auth routes
 router.post('/signin', signin)
 router.post('/signup', signup)
+router.post('/googlesignin', googleSignin)
 router.get('/signout', signout)
 router.get('/userexists/:username', userExists)
 router.post('/changepassword', isAuthorized, changePassword)
