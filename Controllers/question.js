@@ -257,6 +257,7 @@ exports.viewPrevPolls = async (req, res) => {
 
     const count = await Poll.countDocuments({
       createdBy: mongodb.ObjectID(req.userId),
+      deleted: false,
     }).exec()
 
     let prevPage = true
@@ -298,6 +299,7 @@ exports.publicPolls = async (req, res) => {
 
     const count = await Poll.countDocuments({
       createdBy: mongodb.ObjectID(req.userId),
+      deleted: false,
     }).exec()
     let prevPage = true
     let nextPage = true

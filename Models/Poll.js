@@ -33,6 +33,10 @@ const pollSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  shuffle: {
+    type: Boolean,
+    default: false,
+  },
   emails: {
     type: [
       {
@@ -72,6 +76,10 @@ const pollSchema = new mongoose.Schema({
           minLength: 3,
           maxLength: 30,
           required: [true, 'Title is required for required field to vote'],
+        },
+        isRequired: {
+          type: Boolean,
+          default: true,
         },
         options: [
           {
@@ -127,6 +135,10 @@ const pollSchema = new mongoose.Schema({
             maxLength: 50,
           },
         ],
+        isRequired: {
+          type: Boolean,
+          default: false,
+        },
         answer: {
           type: String,
           maxLength: 50,
